@@ -1,5 +1,4 @@
 terraform {
-  required_version = ">= 1.5.0"
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -10,12 +9,6 @@ terraform {
       version = "~> 1.0"
     }
   }
-
-  # Remote state backend configuration (uncomment once backend bucket is created)
-  # backend "gcs" {
-  #   bucket = "YOUR_GCP_PROJECT_ID-tfstate"
-  #   prefix = "env/dev"
-  # }
 }
 
 provider "google" {
@@ -24,5 +17,6 @@ provider "google" {
 }
 
 provider "databricks" {
-  host = var.databricks_host
+  host  = var.databricks_host
+  token = var.databricks_token
 }

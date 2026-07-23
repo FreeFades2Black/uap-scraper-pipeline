@@ -22,3 +22,9 @@ ENV/
 # IDE / OS
 .vscode/
 .DS_Store
+
+*.tfvars
+*.tfstate
+*.tfstate.backup
+.terraform/
+.env
