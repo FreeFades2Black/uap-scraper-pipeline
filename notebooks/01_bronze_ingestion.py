@@ -6,6 +6,10 @@ spark.conf.set("google.cloud.auth.service.account.json.keyfile", "/dbfs/filestor
 spark.conf.set("google.cloud.auth.service.account.enable", "true")
 spark.conf.set("google.cloud.auth.service.account.json.keyfile", "/dbfs/filestore/configs/gcp-key.json")
 # ----------------------------------------
+# --- GCS Authentication Configuration ---
+spark.conf.set("google.cloud.auth.service.account.enable", "true")
+spark.conf.set("google.cloud.auth.service.account.json.keyfile", "/dbfs/filestore/configs/gcp-key.json")
+# ----------------------------------------
 # Databricks notebook source
 # MAGIC %md
 # MAGIC # 01 - Bronze Layer Ingestion (GCS -> Delta)
@@ -64,5 +68,6 @@ query = (
 )
 
 print(f"Bronze ingestion streaming query started: {query.id}")
+
 
 
