@@ -28,3 +28,6 @@ ENV/
 *.tfstate.backup
 .terraform/
 .env
+
+*.json
+configs/*.json
