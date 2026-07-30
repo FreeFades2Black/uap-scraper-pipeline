@@ -43,21 +43,53 @@ def fetch_and_parse_uap_reports(url: str) -> dict:
     """
     logger.info(f"Fetching UAP reports from {url}...")
     
-    # Browser headers to avoid 403 Forbidden
+    # Enhanced browser headers to avoid 403 Forbidden
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.5',
-        'Connection': 'keep-alive'
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'DNT': '1',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'none',
+        'Sec-Fetch-User': '?1',
+        'Cache-Control': 'max-age=0'
     }
     
-    try:
-        response = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT)
-        response.raise_for_status()
-        logger.info(f"Successfully retrieved page (status: {response.status_code})")
-    except requests.RequestException as e:
-        logger.error(f"Failed to fetch URL: {e}")
-        raise
+    # Retry logic with exponential backoff
+    max_retries = 3
+    retry_delay = 2  # seconds
+    
+    for attempt in range(1, max_retries + 1):
+        try:
+            logger.info(f"Attempt {attempt}/{max_retries} - Fetching {url}...")
+            response = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT, allow_redirects=True)
+            response.raise_for_status()
+            logger.info(f"✅ Successfully retrieved page (status: {response.status_code}, size: {len(response.content)} bytes)")
+            break
+        except requests.HTTPError as e:
+            if e.response.status_code == 403:
+                logger.warning(f"Got 403 Forbidden on attempt {attempt}/{max_retries}")
+                if attempt < max_retries:
+                    import time
+                    wait_time = retry_delay * (2 ** (attempt - 1))  # exponential backoff
+                    logger.info(f"Waiting {wait_time}s before retry...")
+                    time.sleep(wait_time)
+                    continue
+            logger.error(f"HTTP error on attempt {attempt}: {e}")
+            if attempt == max_retries:
+                raise
+        except requests.RequestException as e:
+            logger.error(f"Request failed on attempt {attempt}: {e}")
+            if attempt == max_retries:
+                raise
+            import time
+            time.sleep(retry_delay)
+    else:
+        raise requests.RequestException(f"Failed after {max_retries} attempts")
     
     # Parse HTML content
     logger.info("Parsing HTML content...")
