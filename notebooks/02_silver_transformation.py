@@ -22,11 +22,9 @@
 # Table paths
 BRONZE_TABLE = "workspace.default.bronze_uap_raw"
 SILVER_TABLE = "workspace.default.silver_uap_structured"
-CHECKPOINT_PATH = "gs://uap-scraper-lab-2026-lakehouse-data/checkpoints/silver_uap"
 
 print(f"Source: {BRONZE_TABLE}")
 print(f"Target: {SILVER_TABLE}")
-print(f"Checkpoint: {CHECKPOINT_PATH}")
 
 # COMMAND ----------
 
@@ -104,13 +102,8 @@ print(f"   Table: {SILVER_TABLE}")
 
 # COMMAND ----------
 
-# DBTITLE 1,STREAMING: Parse and Structure
-from pyspark.sql.functions import (
-    col, current_timestamp, when, to_timestamp
-)
-
-# Read from bronze (streaming)
-df_bronze_stream = spark.readStream.table(BRONZE_TABLE)
+# DBTITLE 1,Parse and Structure (Batch)
+# This cell is not used - the BATCH version above is used by the scheduled job
 
 # Parse GitHub event data (same transformations as batch)
 df_silver_stream = (

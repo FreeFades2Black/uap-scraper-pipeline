@@ -202,13 +202,8 @@ display(df_timeline.limit(10))
 
 # COMMAND ----------
 
-# DBTITLE 1,STREAMING: Continuous Actor Activity Updates
-from pyspark.sql.functions import (
-    count, countDistinct, window, current_timestamp, col
-)
-
-# Read from silver (streaming)
-df_silver_stream = spark.readStream.table(SILVER_TABLE)
+# DBTITLE 1,Streaming Cell (Not Used)
+# This cell is not used - the BATCH versions above are used by the scheduled job
 
 # Real-time actor activity aggregation with windowing
 df_actor_stream = (

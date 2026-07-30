@@ -44,7 +44,7 @@ print(f"Checkpoint: {CHECKPOINT_PATH}")
 
 # COMMAND ----------
 
-# DBTITLE 1,Setup GCS Authentication for Spark
+# DBTITLE 1,Download JSON files from GCS to Volume
 # Download JSON files from GCS to Unity Catalog Volume
 # This bridges the GCS → Databricks gap on serverless compute
 
@@ -70,7 +70,17 @@ os.makedirs(LOCAL_STAGING_PATH, exist_ok=True)
 bucket = client.bucket(SOURCE_BUCKET)
 blobs = list(bucket.list_blobs(prefix=SOURCE_PREFIX))
 
-downloaded_files = []
+downloaded_count = 0
+for blob in blobs:
+    if blob.name.endswith('.json'):
+        filename = blob.name.split('/')[-1]
+        local_file = os.path.join(LOCAL_STAGING_PATH, filename)
+        blob.download_to_filename(local_file)
+        print(f"✅ Downloaded: {blob.name} → {local_file}")
+        downloaded_count += 1
+
+print(f"\n✅ Downloaded {downloaded_count} JSON files from GCS")
+print(f"   Staging path: {LOCAL_STAGING_PATH}")d_files = []
 for blob in blobs:
     if blob.name.endswith('.json'):
         # Download to staging volume
@@ -118,31 +128,27 @@ print(f"   Table: {BRONZE_TABLE}")
 
 # COMMAND ----------
 
-# DBTITLE 1,STREAMING: Read and Write Bronze
+# DBTITLE 1,Incremental Bronze Ingestion (Batch)
 # Incremental ingestion: Download new files from GCS and append to bronze
-# Run this cell periodically to pick up new files
+# Run this cell as part of the scheduled job
 
 from google.cloud import storage
 from google.oauth2 import service_account
-from pyspark.sql.functions import current_timestamp, col, lit
-import json
+from pyspark.sql.functions import current_timestamp, col
+import os
 
 # Initialize GCS client
 credentials = service_account.Credentials.from_service_account_file(KEY_PATH)
 client = storage.Client(credentials=credentials)
 
-# Get list of already processed files
+# Get list of already processed files (NO RDD - use DataFrame collect)
 if spark.catalog.tableExists(BRONZE_TABLE):
-    processed_files = (
-        spark.read.table(BRONZE_TABLE)
-        .select("_source_file")
-        .distinct()
-        .rdd.flatMap(lambda x: x)
-        .collect()
-    )
-    processed_files = set([f.split('/')[-1] for f in processed_files])
+    processed_df = spark.read.table(BRONZE_TABLE).select("_source_file").distinct().collect()
+    processed_files = set([row._source_file.split('/')[-1] for row in processed_df])
 else:
     processed_files = set()
+
+print(f"Already processed: {len(processed_files)} files")
 
 # List files in GCS
 bucket = client.bucket("uap-scraper-lab-2026-scraper-raw")
@@ -156,7 +162,7 @@ for blob in blobs:
         if filename not in processed_files:
             local_file = os.path.join(LOCAL_STAGING_PATH, filename)
             blob.download_to_filename(local_file)
-            new_files.append(local_file)
+            new_files.append(filename)
             print(f"✅ New file: {blob.name}")
 
 if new_files:
@@ -175,6 +181,8 @@ if new_files:
         .withColumn("_source_file", col("_metadata.file_path"))
     )
     
+    records_count = df_new_bronze.count()
+    
     (
         df_new_bronze.write
         .format("delta")
@@ -185,7 +193,7 @@ if new_files:
     
     print(f"\n✅ Incremental ingestion complete")
     print(f"   New files processed: {len(new_files)}")
-    print(f"   Records added: {df_new_bronze.count()}")
+    print(f"   Records added: {records_count}")
 else:
     print("ℹ️ No new files to process")
 
