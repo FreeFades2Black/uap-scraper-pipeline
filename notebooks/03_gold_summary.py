@@ -203,46 +203,8 @@ display(df_timeline.limit(10))
 # COMMAND ----------
 
 # DBTITLE 1,Streaming Cell (Not Used)
-# This cell is not used - the BATCH versions above are used by the scheduled job
-
-# Real-time actor activity aggregation with windowing
-df_actor_stream = (
-    df_silver_stream
-    .filter(col("has_actor"))
-    .withWatermark("event_timestamp", "1 hour")  # Handle late data
-    .groupBy(
-        window(col("event_timestamp"), "1 hour"),
-        "actor_login", "actor_id"
-    )
-    .agg(
-        count("*").alias("event_count"),
-        countDistinct("event_type").alias("unique_event_types"),
-        countDistinct("repo_name").alias("repos_touched")
-    )
-    .select(
-        col("window.start").alias("window_start"),
-        col("window.end").alias("window_end"),
-        "actor_login", "actor_id",
-        "event_count", "unique_event_types", "repos_touched"
-    )
-    .withColumn("_aggregated_at", current_timestamp())
-)
-
-# Write to gold actor activity table (streaming)
-query = (
-    df_actor_stream.writeStream
-    .format("delta")
-    .outputMode("append")
-    .option("checkpointLocation", f"{CHECKPOINT_PATH}/actor")
-    .trigger(processingTime="5 minutes")  # Update every 5 minutes
-    .toTable(f"{GOLD_BY_ACTOR_TABLE}_stream")
-)
-
-print(f"✅ Streaming gold aggregation started")
-print(f"   Query ID: {query.id}")
-print(f"   Table: {GOLD_BY_ACTOR_TABLE}_stream")
-print(f"   Trigger: Every 5 minutes")
-print(f"\n   To stop: query.stop()")
+# This cell is disabled - the BATCH aggregation cells above are used by the scheduled job
+print("ℹ️ Streaming mode disabled for scheduled job execution")
 
 # COMMAND ----------
 

@@ -102,74 +102,9 @@ print(f"   Table: {SILVER_TABLE}")
 
 # COMMAND ----------
 
-# DBTITLE 1,Parse and Structure (Batch)
-# This cell is not used - the BATCH version above is used by the scheduled job
-
-# Parse GitHub event data (same transformations as batch)
-df_silver_stream = (
-    df_bronze_stream
-    # Core event fields
-    .withColumn("event_id", col("id"))
-    .withColumn("event_type", col("type"))
-    .withColumn("event_timestamp", to_timestamp(col("created_at")))
-    .withColumn("is_public", col("public"))
-    
-    # Actor
-    .withColumn("actor_id", col("actor.id"))
-    .withColumn("actor_login", col("actor.login"))
-    .withColumn("actor_display_login", col("actor.display_login"))
-    .withColumn("actor_url", col("actor.url"))
-    
-    # Organization
-    .withColumn("org_id", col("org.id"))
-    .withColumn("org_login", col("org.login"))
-    .withColumn("org_url", col("org.url"))
-    
-    # Repository
-    .withColumn("repo_id", col("repo.id"))
-    .withColumn("repo_name", col("repo.name"))
-    .withColumn("repo_url", col("repo.url"))
-    
-    # Payload
-    .withColumn("payload_ref", col("payload.ref"))
-    .withColumn("payload_ref_type", col("payload.ref_type"))
-    .withColumn("payload_push_id", col("payload.push_id"))
-    .withColumn("payload_before", col("payload.before"))
-    .withColumn("payload_head", col("payload.head"))
-    .withColumn("payload_description", col("payload.description"))
-    
-    # Metadata
-    .withColumn("extraction_timestamp", to_timestamp(col("extraction_timestamp")))
-    .withColumn("status", col("status"))
-    .withColumn("regions", col("regions"))
-    
-    # Data quality flags
-    .withColumn("has_actor", col("actor_id").isNotNull())
-    .withColumn("has_repo", col("repo_id").isNotNull())
-    .withColumn("has_org", col("org_id").isNotNull())
-    .withColumn("has_timestamp", col("event_timestamp").isNotNull())
-    
-    # Silver metadata
-    .withColumn("_silver_timestamp", current_timestamp())
-    .withColumn("_bronze_source_file", col("_source_file"))
-    .withColumn("_bronze_ingest_timestamp", col("_ingest_timestamp"))
-)
-
-# Write to silver table (streaming)
-query = (
-    df_silver_stream.writeStream
-    .format("delta")
-    .outputMode("append")
-    .option("checkpointLocation", CHECKPOINT_PATH)
-    .option("mergeSchema", "true")
-    .trigger(availableNow=True)  # Micro-batch
-    .toTable(SILVER_TABLE)
-)
-
-query.awaitTermination()
-print(f"✅ Streaming silver transformation complete")
-print(f"   Query ID: {query.id}")
-print(f"   Table: {SILVER_TABLE}")
+# DBTITLE 1,Streaming Cell (Not Used)
+# This cell is disabled - the BATCH transformation cell above is used by the scheduled job
+print("ℹ️ Streaming mode disabled for scheduled job execution")
 
 # COMMAND ----------
 
