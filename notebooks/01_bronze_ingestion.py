@@ -80,16 +80,6 @@ for blob in blobs:
         downloaded_count += 1
 
 print(f"\n✅ Downloaded {downloaded_count} JSON files from GCS")
-print(f"   Staging path: {LOCAL_STAGING_PATH}")d_files = []
-for blob in blobs:
-    if blob.name.endswith('.json'):
-        # Download to staging volume
-        local_file = os.path.join(LOCAL_STAGING_PATH, blob.name.split('/')[-1])
-        blob.download_to_filename(local_file)
-        downloaded_files.append(local_file)
-        print(f"✅ Downloaded: {blob.name} → {local_file}")
-
-print(f"\n✅ Downloaded {len(downloaded_files)} JSON files from GCS")
 print(f"   Staging path: {LOCAL_STAGING_PATH}")
 
 # COMMAND ----------
