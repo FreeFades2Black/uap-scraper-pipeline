@@ -1,16 +1,24 @@
-"""UAP Web Scraper - NUFORC Data Collection
+"""UAP Multi-Source Data Aggregator
 
-Scrapes UAP sighting reports from the National UFO Reporting Center (NUFORC)
-and uploads structured JSON data to Google Cloud Storage for lakehouse ingestion.
+Collects UAP sighting reports from 10+ data sources including:
+- Kaggle (structured datasets)
+- Hugging Face (FBI/DoD declassified)
+- NUFORC (National UFO Reporting Center)
+- MUFON (Mutual UFO Network)
+- NASA UAP Study
+- UFO Stalker
+- And more...
+
+Uploads consolidated JSON data to Google Cloud Storage for lakehouse ingestion.
 """
 
 import os
 import logging
 from datetime import datetime, timezone
 import json
-from bs4 import BeautifulSoup
 from google.cloud import storage
-import requests
+
+from .orchestrator import MultiSourceOrchestrator
 
 # Configure logging
 logging.basicConfig(
@@ -21,28 +29,20 @@ logger = logging.getLogger(__name__)
 
 # Configuration from environment variables
 BUCKET_NAME = os.getenv("GCS_RAW_BUCKET", "uap-scraper-lab-2026-scraper-raw")
-# Try simpler NUFORC pages that may have less aggressive anti-scraping
-TARGET_URL = os.getenv(
-    "TARGET_URL",
-    "https://www.nuforc.org/webreports/ndxevent.html"  # Try with www. subdomain
-)
-REQUEST_TIMEOUT = 30  # seconds
+PARALLEL_COLLECTION = os.getenv("PARALLEL_COLLECTION", "true").lower() == "true"
+MAX_WORKERS = int(os.getenv("MAX_WORKERS", "5"))
 
 
-def fetch_and_parse_uap_reports(url: str) -> dict:
-    """Fetches and parses UAP sighting reports from NUFORC HTML tables.
+def collect_from_all_sources(parallel: bool = True) -> dict:
+    """Collect UAP data from all configured sources.
     
     Args:
-        url: The NUFORC reports page URL to scrape
+        parallel: Whether to run collectors in parallel (faster)
         
     Returns:
-        dict: Structured payload containing scraped sightings with metadata
-        
-    Raises:
-        requests.RequestException: If the HTTP request fails
-        Exception: If parsing encounters unexpected HTML structure
+        dict: Consolidated payload from all sources
     """
-    logger.info(f"Fetching UAP reports from {url}...")
+    logger.info("Initializing multi-source data collection...")
     
     # Initialize orchestrator and collect from all sources
     orchestrator = MultiSourceOrchestrator()
