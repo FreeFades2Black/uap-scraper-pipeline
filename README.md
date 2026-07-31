@@ -1,64 +1,84 @@
-# Cloud Scraper & Lakehouse Infrastructure
+# 🛸 UAP Sightings Data Lakehouse
 
-Automated data ingestion pipeline targeting GCP Cloud Storage and Databricks.
+**Multi-source UAP (Unidentified Aerial Phenomena) data aggregator with end-to-end lakehouse analytics**
 
-## Structure
-- `scraper/`: Python scraper codebase and Docker setup.
-- `terraform/`: GCP and Databricks Infrastructure-as-Code.
-# UAP Lakehouse Pipeline
-
-A complete end-to-end data lakehouse pipeline for ingesting, transforming, and analyzing GitHub events data using Databricks and Unity Catalog.
+Automated pipeline collecting UAP sighting data from 10+ open-source repositories, processing through medallion architecture, and delivering analytics-ready tables in Databricks Unity Catalog.
 
 ## 🏗️ Architecture
 
-This project implements a **medallion architecture** (Bronze → Silver → Gold) for processing GitHub events from Google Cloud Storage (GCS) into analytics-ready tables.
+This project implements a **medallion architecture** (Bronze → Silver → Gold) for processing UAP sighting data from 10+ public sources through Google Cloud Storage (GCS) into analytics-ready tables.
+
+### 🎯 Data Sources
+
+**Currently Implemented:**
+* **Kaggle** - Structured NUFORC CSV datasets (~80K+ historical sightings)
+* **Hugging Face** - FBI/DoD declassified records (via `reducto/ufocr`)
+* **NUFORC** - National UFO Reporting Center web scraping
+
+**Planned Integration:**
+* MUFON (Mutual UFO Network)
+* NASA UAP Independent Study reports
+* AARO (All-domain Anomaly Resolution Office)
+* Black Vault FOIA documents
+* NARA declassified files
+* UFO Stalker mapping database
+* CUFOS archives
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
+│              🌐 Multi-Source Scraper (Cloud Function)            │
+│  Collectors: Kaggle, NUFORC, HuggingFace, MUFON, NASA, etc.    │
+│  Orchestrator: Parallel execution with fault tolerance          │
+│  Output: Consolidated JSON with unified schema                  │
+│  Location: scraper/ (Python 3.11, GCP Cloud Functions Gen2)    │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
 │                    Google Cloud Storage (GCS)                    │
 │  Buckets: uap-scraper-lab-2026-lakehouse-data (staging)        │
-│           uap-scraper-lab-2026-scraper-raw (raw data)           │
+│           uap-scraper-lab-2026-scraper-raw (raw JSON)           │
+│  Format: raw_ingest/uap_sightings_YYYYMMDD_HHMMSS.json         │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
 │                  🥉 Bronze Layer (Raw Data)                      │
 │  Table: workspace.default.bronze_uap_raw                        │
-│  - Raw JSON events from GCS                                     │
-│  - Preserves source structure                                   │
-│  - Includes extraction metadata                                 │
+│  - Raw JSON UAP sighting records from GCS                       │
+│  - Preserves source structure and metadata                      │
+│  - Tracks data_source field (Kaggle, NUFORC, etc.)             │
 │  Notebook: 01_bronze_ingestion.py                               │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
 │               🥈 Silver Layer (Structured Data)                  │
 │  Table: workspace.default.silver_uap_structured                 │
-│  - Parsed and flattened GitHub events                           │
-│  - Extracted actor, repo, org, payload fields                   │
-│  - Quality flags and data type conversions                      │
-│  - 40 structured fields                                         │
+│  - Parsed date/time, location (city, state, country)           │
+│  - Standardized shape, duration fields                          │
+│  - Quality flags and data validation                            │
+│  - Geocoding and temporal normalization                         │
 │  Notebook: 02_silver_transformation.py                           │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
 │              🥇 Gold Layer (Analytics Tables)                    │
 │  Tables:                                                         │
-│  1. workspace.default.gold_github_summary                       │
-│     → Overall KPIs and data quality metrics                     │
-│  2. workspace.default.gold_github_by_actor                      │
-│     → Activity aggregated by contributor                        │
-│  3. workspace.default.gold_github_by_repo                       │
-│     → Activity aggregated by repository                         │
-│  4. workspace.default.gold_github_timeline                      │
-│     → Daily event trends and patterns                           │
+│  1. workspace.default.gold_uap_by_location                      │
+│     → Sightings aggregated by state/country                     │
+│  2. workspace.default.gold_uap_by_shape                         │
+│     → Sightings aggregated by object shape                      │
+│  3. workspace.default.gold_uap_timeline                         │
+│     → Historical trends and temporal patterns                   │
+│  4. workspace.default.gold_uap_by_source                        │
+│     → Data quality metrics per collection source                │
 │  Notebook: 03_gold_summary.py                                    │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
 │                   📊 Analytics Dashboard                         │
-│  GitHub Events Analytics Dashboard (Lakeview)                   │
-│  - 4 KPI cards, 2 bar charts, 1 line chart, 1 pie chart        │
-│  - Published URL with shared data permissions                   │
-│  Documentation: DASHBOARD.md                                     │
+│  UAP Sightings Analytics (Lakeview)                             │
+│  - Temporal trends, geographic heatmaps, shape distribution     │
+│  - Source reliability metrics, data quality indicators          │
+│  - Published URL with shared access                             │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -107,31 +127,39 @@ Execute the notebooks in order:
 # Run: notebooks/01_bronze_ingestion.py
 # Cells: 2 (Config), 3 (Batch), 4 (Incremental), 6 (Verify)
 # Output: workspace.default.bronze_uap_raw
-# Records: 91 GitHub events
+# Records: ~80K+ UAP sightings from all sources
 ```
 
 ##### Silver Transformation
 ```bash
 # Run: notebooks/02_silver_transformation.py
-# Cells: 2 (Config), 3 (Batch Transform), 5 (Quality Check), 6 (Sample)
+# Parses date/time, location, shape, duration fields
+# Standardizes across different source formats
 # Output: workspace.default.silver_uap_structured
-# Fields: 40 structured columns
+# Fields: date_time, city, state, country, shape, duration, summary, data_source
 ```
 
 ##### Gold Aggregations
 ```bash
 # Run: notebooks/03_gold_summary.py
-# Cells: 2 (Config), 3-6 (Batch Aggregations), 7 (Verify)
-# Output: 4 gold analytics tables
+# Creates analytics tables:
+#   - By location (state/country aggregates)
+#   - By shape (object type distribution)
+#   - Timeline (historical trends)
+#   - By source (data quality per collector)
 ```
 
 #### 3. View the Dashboard
 
-Open the published dashboard to explore your analytics:
+Open the Databricks workspace to explore UAP analytics:
 
-**[GitHub Events Analytics Dashboard →](https://dbc-3e95d032-684c.cloud.databricks.com/dashboardsv3/01f18c3e539c18d4a13edd75a1f50656/published?o=7474643734871839)**
+**Databricks Workspace:** https://dbc-3e95d032-684c.cloud.databricks.com
 
-See `DASHBOARD.md` for complete configuration details.
+Dashboards can be built from the gold tables to visualize:
+* Geographic heatmaps of sightings
+* Temporal trends (decades of data)
+* Shape distribution analysis
+* Data source reliability metrics
 
 ## 📊 Data Metrics
 
@@ -165,16 +193,19 @@ Current pipeline status (as of 2026-07-30):
 ### Data Processing
 
 #### Bronze → Silver
-- Flatten nested JSON structures (actor, repo, org, payload)
-- Extract and parse timestamps
-- Add quality flags (has_actor, has_repo, has_org)
-- Type conversions and null handling
+- Parse and normalize date/time formats across sources
+- Standardize location fields (city, state, country)
+- Validate and categorize shape descriptors
+- Extract duration in consistent units
+- Add data_source tracking field
+- Quality flags and validation checks
 
 #### Silver → Gold
-- Aggregate by actor (contributor activity)
-- Aggregate by repository (repo activity)
-- Time-series aggregation (daily trends)
-- Overall summary metrics and KPIs
+- Aggregate by location (state/country heatmaps)
+- Aggregate by shape (object type patterns)
+- Time-series aggregation (decades of trends)
+- Source reliability metrics
+- Data quality KPIs per collector
 
 ## 🔄 Incremental Updates
 
@@ -196,12 +227,13 @@ The analytics dashboard includes:
 
 All queries use pre-aggregated gold tables for fast performance.
 
-## 🔒 Security
+## 🔒 Security & Compliance
 
-- **Unity Catalog Volumes** replace deprecated DBFS root for secure file storage
+- **Unity Catalog Volumes** for secure file storage (no DBFS root)
 - **GCP Service Account Key** stored in encrypted volume
-- **Dashboard Permissions** use shared credential mode (viewers use owner's credentials)
 - **Unity Catalog Governance** enforces table-level access control
+- **Public Data Only** - All sources are open-source UAP repositories
+- **No PII** - Sighting reports contain no personal information
 
 ## 🤝 Contributing
 
