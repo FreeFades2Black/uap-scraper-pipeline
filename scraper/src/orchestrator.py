@@ -19,6 +19,7 @@ from .collectors.nasa_collector import NASACollector
 from .collectors.mufon_collector import MUFONCollector
 from .collectors.ufostalker_collector import UFOStalkerCollector
 from .collectors.aaro_collector import AAROCollector
+from .collectors.global_sensor_mesh_collector import GlobalSensorMeshCollector
 from .collectors.synthetic_collector import SyntheticCollector
 from .config import config
 
@@ -38,7 +39,9 @@ class MultiSourceOrchestrator:
             NASACollector(),
             MUFONCollector(),
             UFOStalkerCollector(),
+            GlobalSensorMeshCollector(),
         ]
+
 
         # Filter by enabled sources if configured
         selected = sources or config.enabled_sources

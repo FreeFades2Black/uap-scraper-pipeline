@@ -195,6 +195,34 @@ def trigger_scrape(request: ScrapeRequest, background: bool = Query(default=Fals
         METRICS["is_scraping"] = False
 
 
+@app.get("/api/v1/sensors/airspace", tags=["Sensor Mesh"])
+def get_airspace_anomalies():
+    """Query live ADS-B secondary surveillance radar anomalies."""
+    from .collectors.global_sensor_mesh_collector import GlobalSensorMeshCollector
+    collector = GlobalSensorMeshCollector()
+    anomalies = collector._fetch_airspace_transponder_mesh()
+    return {"status": "success", "count": len(anomalies), "anomalies": anomalies}
+
+
+@app.get("/api/v1/sensors/orbit", tags=["Sensor Mesh"])
+def get_orbital_satellites():
+    """Query live NORAD / CelesTrak satellite tracks for visual deconfliction."""
+    from .collectors.global_sensor_mesh_collector import GlobalSensorMeshCollector
+    collector = GlobalSensorMeshCollector()
+    satellites = collector._fetch_norad_orbital_mesh()
+    return {"status": "success", "count": len(satellites), "satellites": satellites}
+
+
+@app.get("/api/v1/sensors/intelligence", tags=["Sensor Mesh"])
+def get_sensor_mesh_intelligence():
+    """Query multi-spectrum aerospace intelligence news & sensor triggers."""
+    from .collectors.global_sensor_mesh_collector import GlobalSensorMeshCollector
+    collector = GlobalSensorMeshCollector()
+    intel = collector._fetch_aerospace_intelligence_mesh()
+    return {"status": "success", "count": len(intel), "intelligence_reports": intel}
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host=config.api_host, port=config.api_port)
+

@@ -8,6 +8,7 @@ from .nasa_collector import NASACollector
 from .mufon_collector import MUFONCollector
 from .ufostalker_collector import UFOStalkerCollector
 from .aaro_collector import AAROCollector
+from .global_sensor_mesh_collector import GlobalSensorMeshCollector
 from .synthetic_collector import SyntheticCollector
 
 __all__ = [
@@ -19,5 +20,7 @@ __all__ = [
     "MUFONCollector",
     "UFOStalkerCollector",
     "AAROCollector",
+    "GlobalSensorMeshCollector",
     "SyntheticCollector",
 ]
+
