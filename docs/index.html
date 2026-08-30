@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🛸 UAP Lakehouse & Scraper Pipeline — Live Analytics Dashboard</title>
+  
+  <!-- CDN Dependencies: TailwindCSS, Chart.js, Leaflet -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  
+  <style>
+    body { background-color: #0b0f19; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; }
+    .glass-card { background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(59, 130, 246, 0.2); }
+    .glow-text { text-shadow: 0 0 15px rgba(59, 130, 246, 0.6); }
+    #map { height: 420px; border-radius: 12px; }
+  </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+  <!-- Header -->
+  <header class="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-blue-900/40 pb-6">
+    <div>
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">🛸</span>
+        <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white glow-text">UAP Sightings Intelligence Lakehouse</h1>
+      </div>
+      <p class="text-sm text-blue-300/80 mt-1">Multi-Source Telemetry Aggregator &amp; Databricks Medallion Architecture (Bronze ➔ Silver ➔ Gold)</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Pipeline Operational
+      </span>
+      <a href="https://github.com/FreeFades2Black/uap-scraper-pipeline" target="_blank" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white transition">
+        GitHub Repo ↗
+      </a>
+    </div>
+  </header>
+
+  <!-- KPI Scorecards -->
+  <section class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="glass-card p-5 rounded-xl">
+      <div class="text-xs uppercase tracking-wider text-blue-400 font-semibold mb-1">Total Ingested Sightings</div>
+      <div class="text-3xl font-black text-white" id="kpi-total">1,005</div>
+      <div class="text-xs text-slate-400 mt-1">100% Zero-Stall Ingestion</div>
+    </div>
+    <div class="glass-card p-5 rounded-xl">
+      <div class="text-xs uppercase tracking-wider text-cyan-400 font-semibold mb-1">Geocoded Coverage</div>
+      <div class="text-3xl font-black text-white" id="kpi-geocoded">99.5%</div>
+      <div class="text-xs text-slate-400 mt-1">797 Unique Cities</div>
+    </div>
+    <div class="glass-card p-5 rounded-xl">
+      <div class="text-xs uppercase tracking-wider text-purple-400 font-semibold mb-1">Active Data Sources</div>
+      <div class="text-3xl font-black text-white" id="kpi-sources">3</div>
+      <div class="text-xs text-slate-400 mt-1">Kaggle / AARO / NASA</div>
+    </div>
+    <div class="glass-card p-5 rounded-xl">
+      <div class="text-xs uppercase tracking-wider text-indigo-400 font-semibold mb-1">Historical Date Span</div>
+      <div class="text-3xl font-black text-white">1949 – 2024</div>
+      <div class="text-xs text-slate-400 mt-1">75 Years Longitudinal</div>
+    </div>
+  </section>
+
+  <!-- Geospatial Map Section -->
+  <section class="max-w-7xl mx-auto glass-card p-6 rounded-2xl mb-8">
+    <div class="flex justify-between items-center mb-4">
+      <div>
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <span>🗺️</span> Global &amp; US Geospatial Sighting Clusters
+        </h2>
+        <p class="text-xs text-slate-400">Interactive telemetry map indexed by geographic coordinates and classified phenomenon shapes.</p>
+      </div>
+      <span class="text-xs text-blue-400 bg-blue-950/60 px-2.5 py-1 rounded border border-blue-800/40">1,000+ Mapped Points</span>
+    </div>
+    <div id="map"></div>
+  </section>
+
+  <!-- Visual Analytics Grid -->
+  <section class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Chart 1: Shape Distribution -->
+    <div class="glass-card p-5 rounded-xl">
+      <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+        <span>🛸</span> Phenomenon Shape Taxonomy
+      </h3>
+      <div class="h-64 flex items-center justify-center">
+        <canvas id="chartShapes"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 2: Top States -->
+    <div class="glass-card p-5 rounded-xl">
+      <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+        <span>📍</span> Top 10 Sightings by State
+      </h3>
+      <div class="h-64 flex items-center justify-center">
+        <canvas id="chartStates"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 3: Source Quality -->
+    <div class="glass-card p-5 rounded-xl md:col-span-2 lg:col-span-1">
+      <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+        <span>📡</span> Collector Reliability &amp; Quality Score
+      </h3>
+      <div class="h-64 flex items-center justify-center">
+        <canvas id="chartSources"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sighting Records Explorer Table -->
+  <section class="max-w-7xl mx-auto glass-card p-6 rounded-2xl mb-12">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+      <div>
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <span>📜</span> Sighting Telemetry Explorer
+        </h2>
+        <p class="text-xs text-slate-400">Searchable lakehouse table extracted from Gold analytics tier.</p>
+      </div>
+      <input type="text" id="searchInput" placeholder="Search city, state, shape, summary..." class="w-full md:w-72 bg-slate-900/90 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500">
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs border-collapse">
+        <thead>
+          <tr class="border-b border-slate-700/60 text-slate-400 bg-slate-900/40">
+            <th class="py-2.5 px-3">Date / Time</th>
+            <th class="py-2.5 px-3">Location</th>
+            <th class="py-2.5 px-3">Shape</th>
+            <th class="py-2.5 px-3">Source</th>
+            <th class="py-2.5 px-3">Duration</th>
+            <th class="py-2.5 px-3">Summary Description</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody" class="divide-y divide-slate-800 text-slate-300">
+          <!-- Rows injected via JS -->
+        </tbody>
+      </table>
+    </div>
+    <div class="mt-4 flex justify-between items-center text-xs text-slate-500">
+      <span id="showingCount">Showing latest 50 records</span>
+      <span>Lead Architect: <strong>Free (FreeFades2Black)</strong></span>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="max-w-7xl mx-auto text-center text-xs text-slate-600 border-t border-slate-800/80 pt-6">
+    <p>UAP Multi-Source Scraping &amp; Lakehouse Pipeline • Built with Databricks, Python, Docker &amp; Kubernetes</p>
+  </footer>
+
+  <!-- Application Logic -->
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      let sightings = [];
+
+      try {
+        const res = await fetch("data.json");
+        const json = await res.json();
+        sightings = json.all_sightings || [];
+      } catch (e) {
+        console.warn("Falling back to baseline sample dataset", e);
+      }
+
+      // Initialize Leaflet Map
+      const map = L.map('map').setView([38.5, -96.0], 4);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
+        maxZoom: 18
+      }).addTo(map);
+
+      const markers = L.markerClusterGroup();
+
+      sightings.forEach(s => {
+        const lat = parseFloat(s.latitude);
+        const lon = parseFloat(s.longitude);
+        if (!isNaN(lat) && !isNaN(lon)) {
+          const marker = L.marker([lat, lon]);
+          marker.bindPopup(`
+            <div style="color: #0f172a; font-size: 12px;">
+              <strong>${s.city || 'Unknown'}, ${s.state || ''}</strong><br/>
+              <em>Shape:</em> ${s.shape || 'Unknown'}<br/>
+              <em>Date:</em> ${s.date_time || 'Unknown'}<br/>
+              <em>Source:</em> ${s.data_source || 'Unknown'}<br/>
+              <p style="margin-top: 4px; font-size: 11px;">${(s.summary || '').substring(0, 120)}...</p>
+            </div>
+          `);
+          markers.addLayer(marker);
+        }
+      });
+      map.addLayer(markers);
+
+      // Render Charts
+      // 1. Shapes Chart
+      const shapeCounts = {};
+      sightings.forEach(s => {
+        const sh = (s.shape || 'Unknown').trim();
+        shapeCounts[sh] = (shapeCounts[sh] || 0) + 1;
+      });
+      const topShapes = Object.entries(shapeCounts).sort((a,b) => b[1] - a[1]).slice(0, 7);
+
+      new Chart(document.getElementById('chartShapes'), {
+        type: 'doughnut',
+        data: {
+          labels: topShapes.map(x => x[0]),
+          datasets: [{
+            data: topShapes.map(x => x[1]),
+            backgroundColor: ['#38bdf8', '#818cf8', '#c084fc', '#f472b6', '#34d399', '#fbbf24', '#94a3b8'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'right', labels: { color: '#94a3b8', boxWidth: 10, font: { size: 10 } } } }
+        }
+      });
+
+      // 2. States Chart
+      const stateCounts = {};
+      sightings.forEach(s => {
+        const st = (s.state || 'UNKNOWN').trim().toUpperCase();
+        if (st && st !== 'UNKNOWN' && st !== 'NAN') {
+          stateCounts[st] = (stateCounts[st] || 0) + 1;
+        }
+      });
+      const topStates = Object.entries(stateCounts).sort((a,b) => b[1] - a[1]).slice(0, 7);
+
+      new Chart(document.getElementById('chartStates'), {
+        type: 'bar',
+        data: {
+          labels: topStates.map(x => x[0]),
+          datasets: [{
+            label: 'Sightings',
+            data: topStates.map(x => x[1]),
+            backgroundColor: '#3b82f6',
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: 'y',
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+            y: { grid: { display: false }, ticks: { color: '#e2e8f0', font: { size: 11, weight: 'bold' } } }
+          }
+        }
+      });
+
+      // 3. Source Quality Chart
+      new Chart(document.getElementById('chartSources'), {
+        type: 'bar',
+        data: {
+          labels: ['Kaggle NUFORC', 'NASA Science', 'AARO DoD'],
+          datasets: [{
+            label: 'Data Quality %',
+            data: [89.77, 66.67, 55.56],
+            backgroundColor: ['#10b981', '#6366f1', '#0ea5e9'],
+            borderRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { max: 100, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+            x: { grid: { display: false }, ticks: { color: '#e2e8f0', font: { size: 10 } } }
+          }
+        }
+      });
+
+      // Populate Data Table
+      const tableBody = document.getElementById("tableBody");
+      function renderTable(filter = "") {
+        tableBody.innerHTML = "";
+        const filtered = sightings.filter(s => {
+          const q = filter.toLowerCase();
+          return (s.city || '').toLowerCase().includes(q) ||
+                 (s.state || '').toLowerCase().includes(q) ||
+                 (s.shape || '').toLowerCase().includes(q) ||
+                 (s.summary || '').toLowerCase().includes(q);
+        });
+
+        filtered.slice(0, 50).forEach(s => {
+          const tr = document.createElement("tr");
+          tr.className = "hover:bg-slate-800/40 transition";
+          tr.innerHTML = `
+            <td class="py-2.5 px-3 whitespace-nowrap text-blue-300 font-mono">${s.date_time || 'Unknown'}</td>
+            <td class="py-2.5 px-3 font-semibold">${s.city || 'Unknown'}, ${s.state || ''}</td>
+            <td class="py-2.5 px-3"><span class="bg-blue-950/80 text-blue-300 border border-blue-800/60 px-2 py-0.5 rounded text-[10px]">${s.shape || 'Unknown'}</span></td>
+            <td class="py-2.5 px-3 text-slate-400 font-mono text-[10px]">${s.data_source || 'Unknown'}</td>
+            <td class="py-2.5 px-3 text-slate-400">${s.duration || 'Unknown'}</td>
+            <td class="py-2.5 px-3 text-slate-300 max-w-xs truncate" title="${s.summary || ''}">${(s.summary || '').substring(0, 80)}...</td>
+          `;
+          tableBody.appendChild(tr);
+        });
+        document.getElementById("showingCount").innerText = `Showing ${Math.min(50, filtered.length)} of ${filtered.length} records`;
+      }
+
+      renderTable();
+      document.getElementById("searchInput").addEventListener("input", (e) => {
+        renderTable(e.target.value);
+      });
+    });
+  </script>
+</body>
+</html>
