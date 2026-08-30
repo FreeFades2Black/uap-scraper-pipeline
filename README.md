@@ -47,18 +47,19 @@ Below is the verified multi-source intelligence ledger ingested directly by the 
 | **`10/10/1968 13:00`** | Detroit | Michigan, USA | Chevron | `10 minutes` | Triangular / chevron wing formation flying in perfect synchronization during daylight hours. | [TidyTuesday / NUFORC Archive](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-06-25) |
 | **`10/10/1970 19:00`** | New York City | New York, USA | Sphere | `180 seconds` | Metallic sphere reflecting sunset light hovering stationary near Manhattan skyline. | [Kaggle Historical Dataset](https://www.kaggle.com/datasets/NUFORC_reports) |
 
-> 📊 **Explore All 1,005 Live Plotted Records:** Visit the [**Live Geospatial & Shape Analytics Dashboard**](https://freefades2black.github.io/uap-scraper-pipeline/) to filter by city, state, date, and shape on an interactive map.
+> 📊 **Explore All 1,020+ Live Plotted Records:** Visit the [**Live Geospatial & Sensor Mesh Analytics Dashboard**](https://freefades2black.github.io/uap-scraper-pipeline/) to filter by city, state, date, shape, and sensor type on an interactive map.
 
 ---
 
-## ⚡ What's New in v2.0.0
+## ⚡ What's New in v2.1.0
 
+- 🛰️ **Global Sensor Mesh & Orbital Deconfliction:** Real-time ingestion of CelesTrak NORAD satellite ephemeris, low-Earth orbit trajectories, and Space Surveillance Network (SSN) visual tracks to eliminate false positives.
+- 📡 **OpenSky ADS-B Secondary Surveillance Radar:** Live transponder anomaly detection, emergency squawk decoding (7500/7600/7700), and FL600+ / supersonic vector alerting.
+- 🌐 **Multi-Spectrum Aerospace OSINT Wire:** Continuous parsing of defence, astrophysics, and aerospace research feeds with per-source circuit breakers.
 - 🐳 **Docker & Docker Compose Containerization:** Multi-stage production container with non-root security context (`uapuser:10001`), health checks, and compose orchestration for API, scheduled daemon, and MinIO storage.
 - ☸️ **Kubernetes Orchestration:** Native `batch/v1 CronJob` (for scheduled periodic ingestion) and `apps/v1 Deployment` (for on-demand webhook scraper).
 - ⛵ **Enterprise Helm Chart (`charts/uap-scraper`):** Complete Helm chart with configurable CronJob schedules, HPA, PodDisruptionBudget, and Workload Identity secrets.
-- 🚀 **High-Throughput Parallel Ingestion:** Concurrent `ThreadPoolExecutor` fetching across Kaggle, HuggingFace, NUFORC, AARO DoD, NASA Science, MUFON, and UFOStalker with SHA-256 deduplication and telemetry metrics.
-- 🛰️ **FastAPI Service Daemon:** HTTP microservice exposing `/healthz`, `/readyz`, `/metrics` (Prometheus), and `/scrape` endpoints.
-- 🧪 **Automated Test Suite:** 17 unit, integration, and Helm validation tests in `tests/`.
+- 🛰️ **FastAPI Service Daemon & Sensor Endpoints:** HTTP microservice exposing `/healthz`, `/metrics`, `/scrape`, `/api/v1/sensors/airspace`, `/api/v1/sensors/orbit`, and `/api/v1/sensors/intelligence`.
 
 ---
 
@@ -68,9 +69,11 @@ Below is the verified multi-source intelligence ledger ingested directly by the 
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
 │                        🌐 Multi-Source Ingestion Engine (Python 3.11)                  │
 │  Collectors: Kaggle, Hugging Face, NUFORC, AARO (DoD), NASA Science, MUFON, UFOStalker │
+│  Sensor Mesh: OpenSky ADS-B, CelesTrak NORAD Orbital Deconfliction, Aerospace OSINT     │
 │  Orchestrator: Connection pooling, retry backoff, SHA-256 deduplication, telemetry     │
 │  Resilience: Synthetic telemetry fallback circuit breaker for zero-drop lakehouse runs │
 └───────────────────────────────────────────┬────────────────────────────────────────────┘
+
                                             │
                                             ▼
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
