@@ -14,6 +14,7 @@ import os
 import time
 from typing import Dict, List, Optional
 from fastapi import FastAPI, BackgroundTasks, HTTPException, Query
+from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel, Field
 
 from .config import config
@@ -22,10 +23,11 @@ from .main import run_pipeline
 logger = logging.getLogger("uap_api")
 
 app = FastAPI(
-    title="UAP Multi-Source Scraper Service",
-    description="Containerized High-Throughput UAP Data Ingestion & Lakehouse Pipeline API",
-    version="2.0.0"
+    title="UAP Multi-Source Scraper & Geospatial Sensor Mesh Service",
+    description="Containerized High-Throughput UAP Data Ingestion, Geospatial Analytics & Sensor Mesh API",
+    version="2.1.0"
 )
+
 
 # Global in-memory metrics state
 METRICS = {
@@ -58,7 +60,38 @@ class ScrapeResponse(BaseModel):
     timestamp: Optional[str] = None
 
 
+@app.get("/", response_class=HTMLResponse, tags=["Dashboard"])
+def get_dashboard():
+    """Serve the interactive Geospatial Sensor Mesh & Lakehouse Dashboard."""
+    # Find docs/index.html across possible root dirs
+    candidates = [
+        os.path.abspath("docs/index.html"),
+        os.path.abspath("../docs/index.html"),
+        os.path.join(os.path.dirname(__file__), "../../docs/index.html"),
+    ]
+    for path in candidates:
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                return f.read()
+    return "<h1>UAP Sensor Mesh Dashboard Loading...</h1>"
+
+
+@app.get("/data.json", tags=["Dashboard"])
+def get_dashboard_data():
+    """Serve the latest ingested dataset JSON for the dashboard."""
+    candidates = [
+        os.path.abspath("docs/data.json"),
+        os.path.abspath("../docs/data.json"),
+        os.path.join(os.path.dirname(__file__), "../../docs/data.json"),
+    ]
+    for path in candidates:
+        if os.path.exists(path):
+            return FileResponse(path, media_type="application/json")
+    return {"status": "error", "message": "data.json not found"}
+
+
 @app.get("/healthz", tags=["Probes"])
+
 def health_check():
     """Kubernetes Liveness Probe."""
     return {"status": "healthy", "uptime_seconds": round(time.time() - METRICS["start_time"], 2)}
