@@ -18,16 +18,12 @@ __pycache__/
 venv/
 ENV/
 .env
+data/output/*.json
+configs/*.json
+
+# Allow docs data for GitHub Pages
+!docs/*.json
 
 # IDE / OS
 .vscode/
 .DS_Store
-
-*.tfvars
-*.tfstate
-*.tfstate.backup
-.terraform/
-.env
-
-*.json
-configs/*.json
