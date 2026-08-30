@@ -22,7 +22,9 @@ data/output/*.json
 configs/*.json
 
 # Allow docs data for GitHub Pages
-!docs/*.json
+docs/uap_sightings_*.json
+!docs/data.json
+
 
 # IDE / OS
 .vscode/
