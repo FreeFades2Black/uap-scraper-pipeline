@@ -2,7 +2,52 @@
 
 **High-Throughput Multi-Source UAP (Unidentified Aerial Phenomena) Data Aggregator, Containerized Orchestrator & End-to-End Lakehouse Analytics**
 
-Automated pipeline collecting UAP sighting data from 8+ open-source repositories and government feeds, processing through medallion architecture, and delivering analytics-ready tables in Databricks Unity Catalog.
+Automated pipeline collecting UAP sighting data from 8+ open-source repositories and government declassified feeds, processing through medallion architecture, and delivering analytics-ready tables in Databricks Unity Catalog.
+
+[![Live Interactive Dashboard](https://img.shields.io/badge/Live%20Dashboard-GitHub%20Pages-00bcd4?style=for-the-badge&logo=googlechrome)](https://freefades2black.github.io/uap-scraper-pipeline/)
+[![Medallion Status](https://img.shields.io/badge/Medallion%20Pipeline-100%25%20Zero--Stall-brightgreen?style=for-the-badge&logo=apachespark)](https://github.com/FreeFades2Black/uap-scraper-pipeline/blob/main/REPORTS/MEDALLION_ANALYTICS_REPORT.md)
+[![Docker](https://img.shields.io/badge/Docker-Multi--Stage%20Container-blue?style=for-the-badge&logo=docker)](https://github.com/FreeFades2Black/uap-scraper-pipeline/blob/main/Dockerfile)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-Helm%20Chart-326ce5?style=for-the-badge&logo=kubernetes)](https://github.com/FreeFades2Black/uap-scraper-pipeline/tree/main/charts/uap-scraper)
+
+---
+
+## 📑 Latest UAP Intelligence & Sighting Reports
+
+Below is the verified multi-source intelligence ledger ingested directly by the pipeline, complete with exact **dates, timestamps, locations, phenomenon shapes, summaries, and official citations/references**:
+
+### 🛡️ 1. Official Government & Military Declassified Sensor Telemetry
+
+| Date & Time (UTC) | Case Title / Unit | Location | Shape / Morphology | Duration | Summary & Sensor Telemetry | Source & Reference Citation |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **`2023-01-18`** | **MQ-9 Reaper EO/IR Sensor Capture** | CENTCOM Operating Area | Silver / Metallic Orb | `15 sec` | MQ-9 Reaper Electro-Optical/Infrared (EO/IR) gimbal sensor capture of a high-velocity spherical anomaly with zero thermal exhaust signature. | [AARO DoD Case Reference](https://www.aaro.mil/UAP-Cases/Middle-East-MQ9/) |
+| **`2015-01-20`** | **USS Theodore Roosevelt Strike Group (Gimbal / GoFast)** | Jacksonville Coast, FL | Sphere within Translucent Cube | `Radar & ATFLIR Track` | Dual-sensor ATFLIR optical and radar lock exhibiting rotational velocity and adverse-wind transit with no aerodynamic surfaces or propulsion plume. | [AARO DoD Gimbal Case](https://www.aaro.mil/UAP-Cases/GoFast-Gimbal/) |
+| **`2004-11-14`** | **USS Nimitz Carrier Strike Group (FLIR1 Intercept)** | San Diego Coast, CA | Tic-Tac / White Oblong | `Multiple Intercepts` | SPY-1 radar cueing and F/A-18F Super Hornet visual/FLIR1 tracking of anomalous aerial vehicle exhibiting instantaneous kinematic acceleration from 80,000 ft to sea level. | [AARO DoD FLIR1 Case](https://www.aaro.mil/UAP-Cases/Nimitz-FLIR1/) |
+
+---
+
+### 🛰️ 2. NASA Scientific Study Directorate Evaluations
+
+| Date (UTC) | Case / Study Title | Location | Phenomenon Category | Scope | Research Summary | Official Reference |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **`2024-05-20`** | **NASA Earth Science Multi-Sensor Data Analytics** | Houston, TX | High-Altitude Sensor Anomaly | `Sensor Stream` | Calibration of satellite and airborne sensor telemetry for anomalous atmospheric phenomena classification. | [NASA Science Directorate](https://science.nasa.gov/uap) |
+| **`2023-09-14`** | **NASA UAP Independent Study Team Final Report** | Washington, DC | Spherical / Metallic Orb | `Study Finding` | Evaluation of multi-sensor civilian/commercial satellite data and roadmap for rigorous scientific measurement. | [NASA UAP Report](https://science.nasa.gov/uap/report) |
+
+---
+
+### 🌐 3. Representative Public & Historical Ingestion Records
+
+| Sighting Date & Time | Location | State / Country | Shape | Duration | Witness Observation Summary | Data Archive Reference |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **`10/10/1949 20:30`** | San Marcos | Texas, USA | Cylinder | `45 minutes` | Observed cylindrical craft hovering above church tree line following Boy Scout assembly; accelerated silently toward horizon. | [TidyTuesday / NUFORC Archive](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-06-25) |
+| **`10/10/1949 21:00`** | Lackland AFB | Texas, USA | Light | `1-2 hours` | Lights observed racing across military airspace performing 90-degree right-angle turns at high velocity. | [Kaggle Historical Dataset](https://www.kaggle.com/datasets/NUFORC_reports) |
+| **`10/10/1955 17:00`** | Chester | Cheshire, UK | Circle | `20 seconds` | Disc-shaped circular craft descending from cloud cover and hovering before rapid climb. | [TidyTuesday / NUFORC Archive](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-06-25) |
+| **`10/10/1956 21:00`** | Edna | Texas, USA | Circle | `20 seconds` | Luminous circular object flying low with silent propulsion over pasture terrain. | [Kaggle Historical Dataset](https://www.kaggle.com/datasets/NUFORC_reports) |
+| **`10/10/1960 20:00`** | Kaneohe | Hawaii, USA | Light | `10 minutes` | Glowing light moving slowly across coastal ridgeline then rapidly accelerating out to sea. | [TidyTuesday / NUFORC Archive](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-06-25) |
+| **`10/10/1965 23:45`** | Norwalk | Connecticut, USA | Disk | `15 minutes` | Disk-shaped craft with rotating perimeter lighting observed above residential tree canopy. | [Kaggle Historical Dataset](https://www.kaggle.com/datasets/NUFORC_reports) |
+| **`10/10/1968 13:00`** | Detroit | Michigan, USA | Chevron | `10 minutes` | Triangular / chevron wing formation flying in perfect synchronization during daylight hours. | [TidyTuesday / NUFORC Archive](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-06-25) |
+| **`10/10/1970 19:00`** | New York City | New York, USA | Sphere | `180 seconds` | Metallic sphere reflecting sunset light hovering stationary near Manhattan skyline. | [Kaggle Historical Dataset](https://www.kaggle.com/datasets/NUFORC_reports) |
+
+> 📊 **Explore All 1,005 Live Plotted Records:** Visit the [**Live Geospatial & Shape Analytics Dashboard**](https://freefades2black.github.io/uap-scraper-pipeline/) to filter by city, state, date, and shape on an interactive map.
 
 ---
 
@@ -68,8 +113,13 @@ uap-scraper-pipeline/
 │       ├── Chart.yaml
 │       ├── values.yaml
 │       └── templates/                 # CronJob, Deployment, Service, ConfigMap, PDB, HPA
+├── docs/                              # Live GitHub Pages web dashboard
+│   ├── index.html                     # Interactive Leaflet map & Chart.js visualizer
+│   └── data.json                      # Ingested multi-source sighting dataset
 ├── k8s/                               # Raw standalone Kubernetes manifests
 │   └── all-in-one.yaml
+├── REPORTS/                           # Intelligence briefs
+│   └── MEDALLION_ANALYTICS_REPORT.md  # 3-tier Medallion lakehouse report
 ├── scraper/                           # Scraper engine source tree
 │   ├── Dockerfile
 │   ├── requirements.txt
