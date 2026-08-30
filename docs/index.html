@@ -192,11 +192,11 @@
         console.warn("Falling back to baseline sample dataset", e);
       }
 
-      // Initialize Leaflet Map
+      // Initialize Leaflet Map with Watermark-Free Tactical Dark Base Map
       const map = L.map('map').setView([38.5, -96.0], 4);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap &copy; CARTO',
-        maxZoom: 18
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+        attribution: '&copy; Esri &copy; OpenStreetMap Contributors',
+        maxZoom: 16
       }).addTo(map);
 
       const markers = L.markerClusterGroup();
