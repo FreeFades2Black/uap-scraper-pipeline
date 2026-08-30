@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "uap-scraper.fullname" . }}-config
+  labels:
+    {{- include "uap-scraper.labels" . | nindent 4 }}
+data:
+  GCS_RAW_BUCKET: {{ .Values.config.gcsRawBucket | quote }}
+  GCS_STAGING_BUCKET: {{ .Values.config.gcsStagingBucket | quote }}
+  GCP_PROJECT_ID: {{ .Values.config.gcpProjectId | quote }}
+  UPLOAD_TO_GCS: {{ .Values.config.uploadToGcs | quote }}
+  PARALLEL_COLLECTION: {{ .Values.config.parallelCollection | quote }}
+  MAX_WORKERS: {{ .Values.config.maxWorkers | quote }}
+  ENABLE_SYNTHETIC_FALLBACK: {{ .Values.config.enableSyntheticFallback | quote }}
+  ENABLED_SOURCES: {{ .Values.config.enabledSources | quote }}
+  LOCAL_OUTPUT_DIR: {{ .Values.config.localOutputDir | quote }}
+  API_PORT: {{ .Values.config.apiPort | quote }}
+  API_HOST: {{ .Values.config.apiHost | quote }}

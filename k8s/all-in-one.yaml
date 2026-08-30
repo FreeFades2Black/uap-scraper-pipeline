@@ -1,0 +1,126 @@
+# ==============================================================================
+# Standalone Kubernetes Manifests for UAP Scraper Pipeline
+# ==============================================================================
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: uap-pipeline
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: uap-scraper-config
+  namespace: uap-pipeline
+data:
+  GCS_RAW_BUCKET: "uap-scraper-lab-2026-scraper-raw"
+  GCS_STAGING_BUCKET: "uap-scraper-lab-2026-lakehouse-data"
+  GCP_PROJECT_ID: "uap-scraper-lab-2026"
+  UPLOAD_TO_GCS: "true"
+  PARALLEL_COLLECTION: "true"
+  MAX_WORKERS: "6"
+  ENABLE_SYNTHETIC_FALLBACK: "true"
+  ENABLED_SOURCES: "all"
+  LOCAL_OUTPUT_DIR: "/app/data/output"
+  API_PORT: "8080"
+  API_HOST: "0.0.0.0"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uap-scraper-api
+  namespace: uap-pipeline
+  labels:
+    app.kubernetes.io/name: uap-scraper-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: uap-scraper-api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: uap-scraper-api
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        fsGroup: 10001
+      containers:
+        - name: uap-api
+          image: ghcr.io/freefades2black/uap-scraper:latest
+          command: ["/app/entrypoint.sh", "api"]
+          ports:
+            - containerPort: 8080
+              name: http
+          envFrom:
+            - configMapRef:
+                name: uap-scraper-config
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uap-scraper-api-svc
+  namespace: uap-pipeline
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: uap-scraper-api
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: uap-scraper-cronjob
+  namespace: uap-pipeline
+spec:
+  schedule: "0 */6 * * *" # Every 6 hours
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            fsGroup: 10001
+          containers:
+            - name: uap-scraper-cron
+              image: ghcr.io/freefades2black/uap-scraper:latest
+              command: ["/app/entrypoint.sh", "scrape", "--sources", "all"]
+              envFrom:
+                - configMapRef:
+                    name: uap-scraper-config
+              resources:
+                requests:
+                  cpu: 250m
+                  memory: 512Mi
+                limits:
+                  cpu: 1000m
+                  memory: 1Gi

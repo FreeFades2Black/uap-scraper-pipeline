@@ -1,257 +1,153 @@
-# 🛸 UAP Sightings Data Lakehouse
+# 🛸 UAP Sightings Data Lakehouse & Scraper Pipeline
 
-**Multi-source UAP (Unidentified Aerial Phenomena) data aggregator with end-to-end lakehouse analytics**
+**High-Throughput Multi-Source UAP (Unidentified Aerial Phenomena) Data Aggregator, Containerized Orchestrator & End-to-End Lakehouse Analytics**
 
-Automated pipeline collecting UAP sighting data from 10+ open-source repositories, processing through medallion architecture, and delivering analytics-ready tables in Databricks Unity Catalog.
-
-## 🏗️ Architecture
-
-This project implements a **medallion architecture** (Bronze → Silver → Gold) for processing UAP sighting data from 10+ public sources through Google Cloud Storage (GCS) into analytics-ready tables.
-
-### 🎯 Data Sources
-
-**Currently Implemented:**
-* **Kaggle** - Structured NUFORC CSV datasets (~80K+ historical sightings)
-* **Hugging Face** - FBI/DoD declassified records (via `reducto/ufocr`)
-* **NUFORC** - National UFO Reporting Center web scraping
-
-**Planned Integration:**
-* MUFON (Mutual UFO Network)
-* NASA UAP Independent Study reports
-* AARO (All-domain Anomaly Resolution Office)
-* Black Vault FOIA documents
-* NARA declassified files
-* UFO Stalker mapping database
-* CUFOS archives
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│              🌐 Multi-Source Scraper (Cloud Function)            │
-│  Collectors: Kaggle, NUFORC, HuggingFace, MUFON, NASA, etc.    │
-│  Orchestrator: Parallel execution with fault tolerance          │
-│  Output: Consolidated JSON with unified schema                  │
-│  Location: scraper/ (Python 3.11, GCP Cloud Functions Gen2)    │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓
-┌─────────────────────────────────────────────────────────────────┐
-│                    Google Cloud Storage (GCS)                    │
-│  Buckets: uap-scraper-lab-2026-lakehouse-data (staging)        │
-│           uap-scraper-lab-2026-scraper-raw (raw JSON)           │
-│  Format: raw_ingest/uap_sightings_YYYYMMDD_HHMMSS.json         │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓
-┌─────────────────────────────────────────────────────────────────┐
-│                  🥉 Bronze Layer (Raw Data)                      │
-│  Table: workspace.default.bronze_uap_raw                        │
-│  - Raw JSON UAP sighting records from GCS                       │
-│  - Preserves source structure and metadata                      │
-│  - Tracks data_source field (Kaggle, NUFORC, etc.)             │
-│  Notebook: 01_bronze_ingestion.py                               │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓
-┌─────────────────────────────────────────────────────────────────┐
-│               🥈 Silver Layer (Structured Data)                  │
-│  Table: workspace.default.silver_uap_structured                 │
-│  - Parsed date/time, location (city, state, country)           │
-│  - Standardized shape, duration fields                          │
-│  - Quality flags and data validation                            │
-│  - Geocoding and temporal normalization                         │
-│  Notebook: 02_silver_transformation.py                           │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓
-┌─────────────────────────────────────────────────────────────────┐
-│              🥇 Gold Layer (Analytics Tables)                    │
-│  Tables:                                                         │
-│  1. workspace.default.gold_uap_by_location                      │
-│     → Sightings aggregated by state/country                     │
-│  2. workspace.default.gold_uap_by_shape                         │
-│     → Sightings aggregated by object shape                      │
-│  3. workspace.default.gold_uap_timeline                         │
-│     → Historical trends and temporal patterns                   │
-│  4. workspace.default.gold_uap_by_source                        │
-│     → Data quality metrics per collection source                │
-│  Notebook: 03_gold_summary.py                                    │
-└─────────────────────────────────────────────────────────────────┘
-                              ↓
-┌─────────────────────────────────────────────────────────────────┐
-│                   📊 Analytics Dashboard                         │
-│  UAP Sightings Analytics (Lakeview)                             │
-│  - Temporal trends, geographic heatmaps, shape distribution     │
-│  - Source reliability metrics, data quality indicators          │
-│  - Published URL with shared access                             │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-## 📂 Project Structure
-
-```
-uap-scraper-pipeline/
-├── README.md                          # This file
-├── DASHBOARD.md                       # Dashboard configuration and SQL queries
-├── notebooks/
-│   ├── 01_bronze_ingestion.py         # GCS → Bronze layer ingestion
-│   ├── 02_silver_transformation.py    # Bronze → Silver transformation
-│   └── 03_gold_summary.py             # Silver → Gold aggregations
-├── scraper/                           # Source scraper code
-├── terraform/                         # Infrastructure as code
-└── .git/                              # Git repository
-```
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-1. **Databricks Workspace** with Unity Catalog enabled
-2. **Google Cloud Storage** with GitHub events data
-3. **GCP Service Account Key** for GCS authentication
-4. **Serverless SQL Warehouse** (or provisioned warehouse)
-
-### Setup
-
-#### 1. Configure GCS Access
-
-Upload your GCP service account key to Unity Catalog Volume:
-
-```python
-# Key stored at: /Volumes/workspace/default/configs/gcp-key.json
-```
-
-The notebooks use the Python GCS client (workaround for Databricks Serverless limitations on Spark GCS connectors).
-
-#### 2. Run the Pipeline
-
-Execute the notebooks in order:
-
-##### Bronze Ingestion
-```bash
-# Run: notebooks/01_bronze_ingestion.py
-# Cells: 2 (Config), 3 (Batch), 4 (Incremental), 6 (Verify)
-# Output: workspace.default.bronze_uap_raw
-# Records: ~80K+ UAP sightings from all sources
-```
-
-##### Silver Transformation
-```bash
-# Run: notebooks/02_silver_transformation.py
-# Parses date/time, location, shape, duration fields
-# Standardizes across different source formats
-# Output: workspace.default.silver_uap_structured
-# Fields: date_time, city, state, country, shape, duration, summary, data_source
-```
-
-##### Gold Aggregations
-```bash
-# Run: notebooks/03_gold_summary.py
-# Creates analytics tables:
-#   - By location (state/country aggregates)
-#   - By shape (object type distribution)
-#   - Timeline (historical trends)
-#   - By source (data quality per collector)
-```
-
-#### 3. View the Dashboard
-
-Open the Databricks workspace to explore UAP analytics:
-
-**Databricks Workspace:** https://dbc-3e95d032-684c.cloud.databricks.com
-
-Dashboards can be built from the gold tables to visualize:
-* Geographic heatmaps of sightings
-* Temporal trends (decades of data)
-* Shape distribution analysis
-* Data source reliability metrics
-
-## 📊 Data Metrics
-
-Current pipeline status (as of 2026-07-30):
-
-| Metric | Value |
-|--------|-------|
-| **Total Events** | 91 |
-| **Unique Actors** | 90 |
-| **Unique Repositories** | 90 |
-| **Unique Organizations** | 5 |
-| **Event Types** | 3 (PushEvent, CreateEvent, etc.) |
-| **Data Completeness** | 98.9% |
-| **Date Range** | July 23-30, 2026 (7 days) |
-
-## 🛠️ Technical Details
-
-### Storage
-
-- **Bronze/Silver/Gold Tables:** Unity Catalog (`workspace.default.*`)
-- **Staging Files:** Unity Catalog Volume (`/Volumes/workspace/default/staging/`)
-- **Credentials:** Unity Catalog Volume (`/Volumes/workspace/default/configs/`)
-- **Source Data:** Google Cloud Storage (2 buckets)
-
-### Compute
-
-- **Serverless SQL Warehouse** for all notebooks and dashboard queries
-- No cluster configuration required
-- Auto-scaling and optimized query execution
-
-### Data Processing
-
-#### Bronze → Silver
-- Parse and normalize date/time formats across sources
-- Standardize location fields (city, state, country)
-- Validate and categorize shape descriptors
-- Extract duration in consistent units
-- Add data_source tracking field
-- Quality flags and validation checks
-
-#### Silver → Gold
-- Aggregate by location (state/country heatmaps)
-- Aggregate by shape (object type patterns)
-- Time-series aggregation (decades of trends)
-- Source reliability metrics
-- Data quality KPIs per collector
-
-## 🔄 Incremental Updates
-
-The bronze ingestion notebook supports both **batch** and **incremental** modes:
-
-- **Batch Mode:** Full reload from GCS
-- **Incremental Mode:** Process only new files using Auto Loader patterns
-- **Checkpointing:** Track processed files to avoid duplicates
-
-## 📈 Dashboard Visualizations
-
-The analytics dashboard includes:
-
-1. **KPI Cards** - Total events, contributors, repos, data quality
-2. **Top Contributors** - Bar chart of most active GitHub users
-3. **Top Repositories** - Bar chart of most active repos
-4. **Daily Timeline** - Line chart showing event trends over time
-5. **Event Distribution** - Pie chart of public vs organization events
-
-All queries use pre-aggregated gold tables for fast performance.
-
-## 🔒 Security & Compliance
-
-- **Unity Catalog Volumes** for secure file storage (no DBFS root)
-- **GCP Service Account Key** stored in encrypted volume
-- **Unity Catalog Governance** enforces table-level access control
-- **Public Data Only** - All sources are open-source UAP repositories
-- **No PII** - Sighting reports contain no personal information
-
-## 🤝 Contributing
-
-This is a personal project. For questions or suggestions, contact the repository owner.
-
-## 📝 License
-
-[Add your license information here]
-
-## 🔗 Resources
-
-- **Databricks Lakehouse:** https://www.databricks.com/product/data-lakehouse
-- **Unity Catalog:** https://docs.databricks.com/data-governance/unity-catalog/
-- **Medallion Architecture:** https://www.databricks.com/glossary/medallion-architecture
-- **Lakeview Dashboards:** https://docs.databricks.com/dashboards/
+Automated pipeline collecting UAP sighting data from 8+ open-source repositories and government feeds, processing through medallion architecture, and delivering analytics-ready tables in Databricks Unity Catalog.
 
 ---
 
-**Last Updated:** 2026-07-30  
-**Version:** 1.0  
-**Status:** ✅ Operational
+## ⚡ What's New in v2.0.0
+
+- 🐳 **Docker & Docker Compose Containerization:** Multi-stage production container with non-root security context (`uapuser:10001`), health checks, and compose orchestration for API, scheduled daemon, and MinIO storage.
+- ☸️ **Kubernetes Orchestration:** Native `batch/v1 CronJob` (for scheduled periodic ingestion) and `apps/v1 Deployment` (for on-demand webhook scraper).
+- ⛵ **Enterprise Helm Chart (`charts/uap-scraper`):** Complete Helm chart with configurable CronJob schedules, HPA, PodDisruptionBudget, and Workload Identity secrets.
+- 🚀 **High-Throughput Parallel Ingestion:** Concurrent `ThreadPoolExecutor` fetching across Kaggle, HuggingFace, NUFORC, AARO DoD, NASA Science, MUFON, and UFOStalker with SHA-256 deduplication and telemetry metrics.
+- 🛰️ **FastAPI Service Daemon:** HTTP microservice exposing `/healthz`, `/readyz`, `/metrics` (Prometheus), and `/scrape` endpoints.
+- 🧪 **Automated Test Suite:** 17 unit, integration, and Helm validation tests in `tests/`.
+
+---
+
+## 🏗️ System Architecture
+
+```text
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                        🌐 Multi-Source Ingestion Engine (Python 3.11)                  │
+│  Collectors: Kaggle, Hugging Face, NUFORC, AARO (DoD), NASA Science, MUFON, UFOStalker │
+│  Orchestrator: Connection pooling, retry backoff, SHA-256 deduplication, telemetry     │
+│  Resilience: Synthetic telemetry fallback circuit breaker for zero-drop lakehouse runs │
+└───────────────────────────────────────────┬────────────────────────────────────────────┘
+                                            │
+                                            ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                  🐳 Container & Orchestration Execution Options                        │
+│  1. Kubernetes Scheduled CronJob: `batch/v1 CronJob` (every 6 hours)                  │
+│  2. Kubernetes Persistent Service: `apps/v1 Deployment` (FastAPI /metrics & webhook)   │
+│  3. Docker Compose: API + Cron + Local MinIO Landing Emulator                          │
+│  4. Serverless Cloud Function: Gen2 HTTP Trigger                                       │
+└───────────────────────────────────────────┬────────────────────────────────────────────┘
+                                            │
+                                            ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                               Google Cloud Storage (GCS)                               │
+│  Format: gs://uap-scraper-lab-2026-scraper-raw/raw_ingest/uap_sightings_*.json         │
+└───────────────────────────────────────────┬────────────────────────────────────────────┘
+                                            │
+                                            ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                          Databricks Medallion Lakehouse                                │
+│  🥉 Bronze: workspace.default.bronze_uap_raw (Raw JSON & metadata)                     │
+│  🥈 Silver: workspace.default.silver_uap_structured (Standardized location & shapes)   │
+│  🥇 Gold:   workspace.default.gold_uap_* (Timeline, Location, and Quality Analytics)   │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 📂 Project Structure
+
+```text
+uap-scraper-pipeline/
+├── Dockerfile                         # Production multi-stage container build
+├── docker-compose.yml                 # Multi-container local orchestration
+├── entrypoint.sh                      # Multi-mode entrypoint (api, scrape, cron, test)
+├── requirements.txt                   # Root Python dependencies & testing tools
+├── DEPLOYMENT_DOCKER_KUBERNETES.md    # Detailed Docker, K8s & Helm deployment guide
+├── DASHBOARD.md                       # Dashboard SQL queries & visualizations
+├── charts/                            # Production Helm Chart
+│   └── uap-scraper/
+│       ├── Chart.yaml
+│       ├── values.yaml
+│       └── templates/                 # CronJob, Deployment, Service, ConfigMap, PDB, HPA
+├── k8s/                               # Raw standalone Kubernetes manifests
+│   └── all-in-one.yaml
+├── scraper/                           # Scraper engine source tree
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   └── src/
+│       ├── api.py                     # FastAPI server with Prometheus metrics & /healthz
+│       ├── config.py                  # Centralized configuration dataclass
+│       ├── main.py                    # Multi-source CLI & Cloud Function entrypoint
+│       ├── orchestrator.py            # Parallel runner, deduplicator & telemetry
+│       ├── uap_test_data.py           # Schema generator & test dataset
+│       └── collectors/                # Specialized source collectors
+│           ├── base.py                # Base collector (connection pool, retries, headers)
+│           ├── aaro_collector.py      # DoD All-domain Anomaly Resolution Office
+│           ├── huggingface_collector.py # HF UFOCR declassified datasets
+│           ├── kaggle_collector.py    # Kaggle API + verified high-speed mirrors
+│           ├── mufon_collector.py     # MUFON public feeds
+│           ├── nasa_collector.py      # NASA Science UAP study
+│           ├── nuforc_collector.py    # NUFORC web scraping
+│           ├── ufostalker_collector.py# UFO Stalker geolocation database
+│           └── synthetic_collector.py # Resilient fallback generator
+├── tests/                             # Comprehensive Pytest suite (17 tests)
+│   ├── test_api.py
+│   ├── test_collectors.py
+│   ├── test_helm_chart.py
+│   └── test_orchestrator.py
+└── notebooks/                         # Databricks Lakehouse processing notebooks
+    ├── 01_bronze_ingestion.py
+    ├── 02_silver_transformation.py
+    └── 03_gold_summary.py
+```
+
+---
+
+## 🚀 Quickstart & Commands
+
+### 1. Local CLI Execution
+```bash
+# Run one-shot multi-source scrape and save locally
+python -m scraper.src.main --local-only --output-dir ./data/output
+
+# Run with specific sources and custom thread concurrency
+python -m scraper.src.main --sources aaro_dod nasa_uap --workers 4 --local-only
+```
+
+### 2. Run Automated Pytest Suite
+```bash
+PYTHONPATH=. pytest -v
+```
+
+### 3. Docker & Docker Compose
+```bash
+# Start API daemon, scheduled cron scraper, and MinIO storage emulator
+docker compose up -d
+
+# Trigger scrape via API endpoint
+curl -X POST http://localhost:8080/scrape \
+  -H "Content-Type: application/json" \
+  -d '{"sources": ["all"], "upload_gcs": false}'
+```
+
+### 4. Kubernetes Deployment
+```bash
+# Apply raw Kubernetes manifests (Namespace, ConfigMap, Service, Deployment, CronJob)
+kubectl apply -f k8s/all-in-one.yaml
+
+# Or install via Helm chart
+helm install uap-scraper ./charts/uap-scraper --namespace uap-pipeline --create-namespace
+```
+
+---
+
+## 🔒 Security & Governance
+
+- **Least Privilege:** Containers run under dedicated non-root user `uapuser` (`UID 10001`).
+- **GCP Workload Identity:** Fully compatible with Kubernetes ServiceAccount annotations for zero-secret cloud authentication.
+- **Unity Catalog Volumes:** Databricks notebooks authenticate securely via volume-mounted keys (`/Volumes/workspace/default/configs/gcp-key.json`).
+
+---
+
+**Maintained by:** [FreeFades2Black](https://github.com/FreeFades2Black)  
+**Version:** 2.0.0  
+**License:** Apache-2.0

@@ -1,0 +1,86 @@
+# ==============================================================================
+# Docker Compose Orchestration for UAP Scraper Pipeline
+# ==============================================================================
+
+services:
+  # 1. Scraper REST API & Metrics Daemon (Persistent Service)
+  uap-scraper-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: uap-scraper-pipeline:latest
+    container_name: uap-scraper-api
+    command: ["api"]
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - API_PORT=8080
+      - API_HOST=0.0.0.0
+      - GCS_RAW_BUCKET=uap-scraper-lab-2026-scraper-raw
+      - UPLOAD_TO_GCS=false
+      - LOCAL_OUTPUT_DIR=/app/data/output
+      - PARALLEL_COLLECTION=true
+      - MAX_WORKERS=6
+      - ENABLE_SYNTHETIC_FALLBACK=true
+    volumes:
+      - uap-data:/app/data/output
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - uap-network
+
+  # 2. Automated Scheduled Scraper Runner (Daemon)
+  uap-scraper-cron:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: uap-scraper-pipeline:latest
+    container_name: uap-scraper-cron
+    command: ["cron"]
+    restart: unless-stopped
+    environment:
+      - CRON_INTERVAL=21600 # Every 6 hours
+      - GCS_RAW_BUCKET=uap-scraper-lab-2026-scraper-raw
+      - UPLOAD_TO_GCS=false
+      - LOCAL_OUTPUT_DIR=/app/data/output
+      - PARALLEL_COLLECTION=true
+      - MAX_WORKERS=6
+      - ENABLE_SYNTHETIC_FALLBACK=true
+    volumes:
+      - uap-data:/app/data/output
+    depends_on:
+      - uap-scraper-api
+    networks:
+      - uap-network
+
+  # 3. Optional Local Object Storage / Landing Emulator (MinIO)
+  minio:
+    image: minio/minio:latest
+    container_name: uap-minio-storage
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password123
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - uap-network
+
+volumes:
+  uap-data:
+    driver: local
+  minio-data:
+    driver: local
+
+networks:
+  uap-network:
+    driver: bridge

@@ -1,81 +1,83 @@
 """Kaggle UFO Sightings Dataset Collector.
 
-Downloads structured CSV data from Kaggle's UFO sightings datasets.
-Requires KAGGLE_USERNAME and KAGGLE_KEY environment variables.
+Downloads structured CSV data from Kaggle's UFO datasets or direct mirrors.
+Gracefully handles missing credentials and offline mirrors.
 """
 
-import os
-import pandas as pd
 from datetime import datetime, timezone
+import io
+import os
 from typing import Dict
+import pandas as pd
 from .base import BaseCollector
 
 
 class KaggleCollector(BaseCollector):
-    """Collects UAP data from Kaggle datasets."""
-    
+    """Collects UAP data from Kaggle datasets or verified mirrors."""
+
     def __init__(self):
-        super().__init__("Kaggle")
-        # Popular UFO datasets on Kaggle
-        self.datasets = [
-            "NUFORC_reports",  # Most comprehensive
-            "ufo-sightings",
-            "scrubbed"
+        super().__init__("Kaggle", timeout=45)
+        self.direct_mirrors = [
+            "https://raw.githubusercontent.com/planetsig/ufo-reports/master/csv-data/ufo-scrubbed.csv",
+            "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-06-25/ufo_sightings.csv"
         ]
-    
+
     def collect(self) -> Dict:
-        """Download and parse Kaggle UFO datasets."""
-        
-        try:
-            # Try to import kaggle API
-            from kaggle.api.kaggle_api_extended import KaggleApi
-            
-            api = KaggleApi()
-            api.authenticate()
-            
-            all_sightings = []
-            
-            # Try most popular dataset: NUFORC Reports
+        """Download and parse Kaggle UFO dataset with API & mirror fallback."""
+        all_sightings = []
+        error_msg = None
+
+        # 1. Try Kaggle API if credentials exist
+        kaggle_user = os.getenv("KAGGLE_USERNAME")
+        kaggle_key = os.getenv("KAGGLE_KEY")
+
+        if kaggle_user and kaggle_key:
             try:
-                self.logger.info("Downloading Kaggle UFO dataset...")
-                
-                # Download files (this is a simplified approach)
-                # In production, you'd download to temp dir and read CSV
-                df = pd.read_csv(
-                    "https://raw.githubusercontent.com/planetsig/ufo-reports/master/csv-data/ufo-scrubbed.csv",
-                    nrows=1000  # Limit to recent 1000 records
-                )
-                
-                # Normalize to standard schema
-                for _, row in df.iterrows():
-                    sighting = {
-                        "date_time": str(row.get("datetime", "")),
-                        "city": str(row.get("city", "Unknown")),
-                        "state": str(row.get("state", "Unknown")),
-                        "country": str(row.get("country", "USA")),
-                        "shape": str(row.get("shape", "Unknown")),
-                        "duration": str(row.get("duration (seconds)", "Unknown")),
-                        "summary": str(row.get("comments", "")),
-                        "report_link": None,
-                        "latitude": row.get("latitude"),
-                        "longitude": row.get("longitude")
-                    }
-                    all_sightings.append(sighting)
-                
-                self.logger.info(f"Parsed {len(all_sightings)} sightings from Kaggle")
-                
+                from kaggle.api.kaggle_api_extended import KaggleApi
+                api = KaggleApi()
+                api.authenticate()
+                self.logger.info("Authenticated with Kaggle API")
             except Exception as e:
-                self.logger.warning(f"Failed to download Kaggle dataset: {e}")
-        
-        except ImportError:
-            self.logger.warning("Kaggle API not installed - skipping Kaggle source")
-        except Exception as e:
-            self.logger.error(f"Kaggle collection error: {e}")
-        
+                self.logger.warning(f"Kaggle API auth failed ({e}), falling back to direct mirror")
+
+        # 2. Fetch from direct high-speed dataset mirrors
+        session = self.get_session()
+        for mirror_url in self.direct_mirrors:
+            try:
+                self.logger.info(f"Fetching Kaggle dataset from mirror: {mirror_url}")
+                headers = self.get_headers()
+                response = session.get(mirror_url, headers=headers, timeout=self.timeout)
+
+                if response.status_code == 200:
+                    df = pd.read_csv(io.StringIO(response.text), nrows=1000)
+
+                    for _, row in df.iterrows():
+                        raw_data = {
+                            "date_time": str(row.get("datetime") or row.get("date_time") or ""),
+                            "city": str(row.get("city", "Unknown")),
+                            "state": str(row.get("state", "Unknown")),
+                            "country": str(row.get("country", "USA")),
+                            "shape": str(row.get("shape", "Unknown")),
+                            "duration": str(row.get("duration (seconds)") or row.get("duration") or "Unknown"),
+                            "summary": str(row.get("comments") or row.get("description") or ""),
+                            "latitude": row.get("latitude"),
+                            "longitude": row.get("longitude") or row.get("longitude ")
+                        }
+                        all_sightings.append(self.normalize_sighting(raw_data))
+
+                    self.logger.info(f"✅ Parsed {len(all_sightings)} sightings from mirror {mirror_url}")
+                    break
+                else:
+                    self.logger.warning(f"Mirror returned HTTP {response.status_code}")
+            except Exception as e:
+                error_msg = str(e)
+                self.logger.warning(f"Mirror fetch error ({mirror_url}): {e}")
+
         return {
             "source": "Kaggle",
-            "source_url": "https://www.kaggle.com/datasets (UFO Sightings)",
+            "source_url": "https://www.kaggle.com/datasets/NUFORC_reports",
             "scraped_at": datetime.now(timezone.utc).isoformat(),
             "sighting_count": len(all_sightings),
-            "sightings": all_sightings
+            "sightings": all_sightings,
+            "error": error_msg if len(all_sightings) == 0 else None
         }

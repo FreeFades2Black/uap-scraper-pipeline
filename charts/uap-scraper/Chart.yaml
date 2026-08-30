@@ -1,0 +1,17 @@
+apiVersion: v2
+name: uap-scraper
+description: Enterprise Multi-Source UAP Scraper & Lakehouse Ingestion Engine
+type: application
+version: 0.2.0
+appVersion: "2.0.0"
+keywords:
+  - uap
+  - scraper
+  - lakehouse
+  - databricks
+  - gcs
+  - cronjob
+home: https://github.com/FreeFades2Black/uap-scraper-pipeline
+maintainers:
+  - name: FreeFades2Black
+    email: whall4.wh@gmail.com

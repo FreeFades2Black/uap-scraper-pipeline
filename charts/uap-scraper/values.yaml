@@ -1,0 +1,143 @@
+# Default values for uap-scraper Helm chart.
+
+replicaCount: 1
+
+image:
+  repository: ghcr.io/freefades2black/uap-scraper
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# Persistent API / Webhook Deployment
+deployment:
+  enabled: true
+  replicaCount: 1
+  command: ["api"]
+
+# Automated Periodic Scheduled Scraper (CronJob)
+cronjob:
+  enabled: true
+  schedule: "0 */6 * * *" # Run every 6 hours
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 5
+  restartPolicy: OnFailure
+  backoffLimit: 2
+  command: ["scrape"]
+  args: ["--sources", "all"]
+
+# Pipeline Configuration (injected via ConfigMap)
+config:
+  gcsRawBucket: "uap-scraper-lab-2026-scraper-raw"
+  gcsStagingBucket: "uap-scraper-lab-2026-lakehouse-data"
+  gcpProjectId: "uap-scraper-lab-2026"
+  uploadToGcs: "true"
+  parallelCollection: "true"
+  maxWorkers: "6"
+  enableSyntheticFallback: "true"
+  enabledSources: "all"
+  localOutputDir: "/app/data/output"
+  apiPort: "8080"
+  apiHost: "0.0.0.0"
+
+# Secrets (Optional credentials for GCP / Kaggle)
+secrets:
+  create: false
+  secretName: "uap-scraper-secrets"
+  gcpServiceAccountKeyJson: ""
+  kaggleUsername: ""
+  kaggleKey: ""
+
+serviceAccount:
+  create: true
+  automount: true
+  annotations:
+    # Example for GCP Workload Identity:
+    # iam.gke.io/gcp-service-account: uap-scraper-sa@uap-scraper-lab-2026.iam.gserviceaccount.com
+  name: ""
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8080"
+  prometheus.io/path: "/metrics"
+
+podLabels:
+  app.kubernetes.io/component: uap-engine
+
+podSecurityContext:
+  fsGroup: 10001
+  runAsNonRoot: true
+  runAsUser: 10001
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations: {}
+  hosts:
+    - host: uap-scraper.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 250m
+    memory: 512Mi
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 8080
+  initialDelaySeconds: 15
+  periodSeconds: 20
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 15
+  timeoutSeconds: 5
+  failureThreshold: 2
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Persistent volume for local staging cache (optional)
+persistence:
+  enabled: false
+  accessMode: ReadWriteOnce
+  size: 5Gi
+  storageClass: ""
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

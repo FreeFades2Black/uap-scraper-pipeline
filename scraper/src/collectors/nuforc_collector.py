@@ -1,115 +1,115 @@
 """NUFORC (National UFO Reporting Center) Collector.
 
-Scrapes sighting data from nuforc.org with enhanced anti-blocking measures.
+Scrapes sighting data from nuforc.org with enhanced anti-blocking measures,
+session reuse, and resilient table parsing.
 """
 
-import requests
-from bs4 import BeautifulSoup
 from datetime import datetime, timezone
 import time
 from typing import Dict
+from bs4 import BeautifulSoup
 from .base import BaseCollector
 
 
 class NUFORCCollector(BaseCollector):
     """Collects UAP data from NUFORC.org."""
-    
+
     def __init__(self):
-        super().__init__("NUFORC")
+        super().__init__("NUFORC", timeout=30)
         self.base_urls = [
             "https://www.nuforc.org/webreports/ndxevent.html",
+            "https://nuforc.org/webreports/ndxevent.html",
             "http://www.nuforc.org/webreports/ndxevent.html",
-            "https://nuforc.org/webreports/ndxevent.html"
+            "https://nuforc.org/webreports/ndxe.html"
         ]
-        self.timeout = 30
-    
-    def _get_headers(self) -> dict:
-        """Generate browser-like headers."""
-        return {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'DNT': '1',
-            'Connection': 'keep-alive',
-            'Upgrade-Insecure-Requests': '1',
-            'Sec-Fetch-Dest': 'document',
-            'Sec-Fetch-Mode': 'navigate',
-            'Sec-Fetch-Site': 'same-origin',
-            'Sec-Fetch-User': '?1',
-            'Referer': 'https://www.nuforc.org/',
-            'Cache-Control': 'max-age=0'
-        }
-    
+
     def collect(self) -> Dict:
-        """Scrape NUFORC sighting reports."""
-        
+        """Scrape NUFORC sighting reports with fallback URLs and anti-blocking."""
         all_sightings = []
         last_error = None
-        
-        # Try multiple URLs
+        session = self.get_session()
+
         for url in self.base_urls:
             try:
-                self.logger.info(f"Attempting: {url}")
-                
-                response = requests.get(
+                self.logger.info(f"Attempting NUFORC scrape: {url}")
+                headers = self.get_headers({"Referer": "https://www.google.com/"})
+
+                response = session.get(
                     url,
-                    headers=self._get_headers(),
+                    headers=headers,
                     timeout=self.timeout,
                     allow_redirects=True
                 )
-                
+
                 if response.status_code == 403:
-                    self.logger.warning(f"403 Forbidden from {url}")
+                    self.logger.warning(f"403 Forbidden from {url} - backing off")
                     last_error = "403 Forbidden"
-                    time.sleep(3)  # Wait before next attempt
+                    time.sleep(2)
                     continue
-                
-                response.raise_for_status()
-                
-                # Parse HTML
+
+                if response.status_code != 200:
+                    self.logger.warning(f"Unexpected status {response.status_code} from {url}")
+                    last_error = f"HTTP {response.status_code}"
+                    continue
+
+                # Parse HTML table
                 soup = BeautifulSoup(response.text, "html.parser")
                 table = soup.find("table")
-                
+
                 if not table:
-                    self.logger.warning(f"No table found at {url}")
+                    # Look for alternative table selectors
+                    tables = soup.find_all("table")
+                    if tables:
+                        table = tables[0]
+
+                if not table:
+                    self.logger.warning(f"No table structure found at {url}")
                     continue
-                
+
                 rows = table.find_all("tr")
-                self.logger.info(f"Found {len(rows)} rows")
-                
-                # Parse rows
-                for row in rows[1:]:  # Skip header
+                self.logger.info(f"Found {len(rows)} table rows at {url}")
+
+                for row in rows[1:]:  # Skip header row
                     cols = row.find_all("td")
-                    if len(cols) < 6:
+                    if len(cols) < 5:
                         continue
-                    
-                    sighting = {
-                        "date_time": cols[0].get_text(strip=True),
-                        "city": cols[1].get_text(strip=True),
-                        "state": cols[2].get_text(strip=True),
-                        "country": cols[3].get_text(strip=True),
-                        "shape": cols[4].get_text(strip=True),
-                        "duration": cols[5].get_text(strip=True),
-                        "summary": cols[6].get_text(strip=True) if len(cols) > 6 else "",
-                        "report_link": None
+
+                    date_text = cols[0].get_text(strip=True)
+                    city_text = cols[1].get_text(strip=True) if len(cols) > 1 else "Unknown"
+                    state_text = cols[2].get_text(strip=True) if len(cols) > 2 else "Unknown"
+                    country_text = cols[3].get_text(strip=True) if len(cols) > 3 else "USA"
+                    shape_text = cols[4].get_text(strip=True) if len(cols) > 4 else "Unknown"
+                    duration_text = cols[5].get_text(strip=True) if len(cols) > 5 else "Unknown"
+                    summary_text = cols[6].get_text(strip=True) if len(cols) > 6 else ""
+
+                    # Extract link
+                    report_link = None
+                    link_elem = cols[0].find("a")
+                    if link_elem and link_elem.get("href"):
+                        href = link_elem["href"]
+                        report_link = f"https://www.nuforc.org/webreports/{href}" if not href.startswith("http") else href
+
+                    raw_item = {
+                        "date_time": date_text,
+                        "city": city_text,
+                        "state": state_text,
+                        "country": country_text,
+                        "shape": shape_text,
+                        "duration": duration_text,
+                        "summary": summary_text,
+                        "report_link": report_link
                     }
-                    
-                    # Extract link if available
-                    link = cols[0].find("a")
-                    if link and link.get("href"):
-                        sighting["report_link"] = f"https://www.nuforc.org{link['href']}"
-                    
-                    all_sightings.append(sighting)
-                
-                self.logger.info(f"✅ Successfully scraped {len(all_sightings)} from NUFORC")
-                break  # Success! Stop trying other URLs
-                
+                    all_sightings.append(self.normalize_sighting(raw_item))
+
+                if all_sightings:
+                    self.logger.info(f"✅ Successfully scraped {len(all_sightings)} records from NUFORC")
+                    break
+
             except Exception as e:
                 last_error = str(e)
-                self.logger.warning(f"Failed {url}: {e}")
+                self.logger.warning(f"Failed scraping {url}: {e}")
                 continue
-        
+
         return {
             "source": "NUFORC",
             "source_url": self.base_urls[0],

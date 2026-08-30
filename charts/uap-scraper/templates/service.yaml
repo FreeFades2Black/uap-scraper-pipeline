@@ -1,0 +1,17 @@
+{{- if .Values.deployment.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "uap-scraper.fullname" . }}
+  labels:
+    {{- include "uap-scraper.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort | default 8080 }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "uap-scraper.selectorLabels" . | nindent 4 }}
+{{- end }}

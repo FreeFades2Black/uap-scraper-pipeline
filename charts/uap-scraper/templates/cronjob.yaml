@@ -1,0 +1,54 @@
+{{- if .Values.cronjob.enabled -}}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "uap-scraper.fullname" . }}-cron
+  labels:
+    {{- include "uap-scraper.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.cronjob.schedule | quote }}
+  concurrencyPolicy: {{ .Values.cronjob.concurrencyPolicy | default "Forbid" }}
+  successfulJobsHistoryLimit: {{ .Values.cronjob.successfulJobsHistoryLimit | default 3 }}
+  failedJobsHistoryLimit: {{ .Values.cronjob.failedJobsHistoryLimit | default 5 }}
+  jobTemplate:
+    spec:
+      backoffLimit: {{ .Values.cronjob.backoffLimit | default 2 }}
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: {{ include "uap-scraper.name" . }}-cron
+            app.kubernetes.io/instance: {{ .Release.Name }}
+        spec:
+          restartPolicy: {{ .Values.cronjob.restartPolicy | default "OnFailure" }}
+          serviceAccountName: {{ include "uap-scraper.serviceAccountName" . }}
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+          containers:
+            - name: uap-scraper-job
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              command: ["/app/entrypoint.sh"]
+              args:
+                - {{ .Values.cronjob.command | default "scrape" | quote }}
+                {{- range .Values.cronjob.args }}
+                - {{ . | quote }}
+                {{- end }}
+              envFrom:
+                - configMapRef:
+                    name: {{ include "uap-scraper.fullname" . }}-config
+                {{- if .Values.secrets.create }}
+                - secretRef:
+                    name: {{ .Values.secrets.secretName | default (printf "%s-secrets" (include "uap-scraper.fullname" .)) }}
+                    optional: true
+                {{- end }}
+              resources:
+                {{- toYaml .Values.resources | nindent 16 }}
+              securityContext:
+                {{- toYaml .Values.securityContext | nindent 16 }}
+              volumeMounts:
+                - name: storage-volume
+                  mountPath: /app/data
+          volumes:
+            - name: storage-volume
+              emptyDir: {}
+{{- end }}

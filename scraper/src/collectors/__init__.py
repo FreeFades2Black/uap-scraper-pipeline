@@ -1,22 +1,23 @@
-"""UAP Data Collectors Package.
-
-Contains modular collectors for each UAP data source.
-"""
+"""UAP Data Collectors Package."""
 
 from .base import BaseCollector
 from .nuforc_collector import NUFORCCollector
 from .kaggle_collector import KaggleCollector
-from .mufon_collector import MUFONCollector
-from .nasa_collector import NASACollector
 from .huggingface_collector import HuggingFaceCollector
+from .nasa_collector import NASACollector
+from .mufon_collector import MUFONCollector
 from .ufostalker_collector import UFOStalkerCollector
+from .aaro_collector import AAROCollector
+from .synthetic_collector import SyntheticCollector
 
 __all__ = [
-    'BaseCollector',
-    'NUFORCCollector',
-    'KaggleCollector',
-    'MUFONCollector',
-    'NASACollector',
-    'HuggingFaceCollector',
-    'UFOStalkerCollector',
+    "BaseCollector",
+    "NUFORCCollector",
+    "KaggleCollector",
+    "HuggingFaceCollector",
+    "NASACollector",
+    "MUFONCollector",
+    "UFOStalkerCollector",
+    "AAROCollector",
+    "SyntheticCollector",
 ]

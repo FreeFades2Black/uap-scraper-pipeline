@@ -1,0 +1,13 @@
+{{- if and .Values.deployment.enabled .Values.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "uap-scraper.fullname" . }}
+  labels:
+    {{- include "uap-scraper.labels" . | nindent 4 }}
+spec:
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable | default 1 }}
+  selector:
+    matchLabels:
+      {{- include "uap-scraper.selectorLabels" . | nindent 6 }}
+{{- end }}

@@ -1,16 +1,22 @@
-# Core dependencies
+# Core Networking & Scraping
 requests>=2.31.0
 beautifulsoup4>=4.12.0
+lxml>=4.9.0
+urllib3>=2.0.0
+
+# Cloud & Storage
 google-cloud-storage>=2.10.0
+google-auth>=2.20.0
+
+# Web API & Kubernetes Microservice
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
 pydantic>=2.0.0
 flask>=3.0.0
 functions-framework>=3.5.0
 
-# Multi-source data collection
+# Data Normalization & Ingestion
 pandas>=2.0.0
+numpy>=1.24.0
 kaggle>=1.5.16
-datasets>=2.14.0  # Hugging Face datasets
-
-# Optional (install if using specific sources)
-# transformers>=4.30.0  # For advanced HF models
-# arxiv>=1.4.0  # For academic paper sources
+datasets>=2.14.0

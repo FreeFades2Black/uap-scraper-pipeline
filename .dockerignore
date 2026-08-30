@@ -1,0 +1,17 @@
+.git
+.gitignore
+.pytest_cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env
+.venv
+venv/
+data/output/*
+!data/output/.gitkeep
+notebooks/
+terraform/.terraform
+terraform/*.tfstate*
+charts/
+tests/
