@@ -18,8 +18,8 @@ class KaggleCollector(BaseCollector):
     def __init__(self):
         super().__init__("Kaggle", timeout=45)
         self.direct_mirrors = [
-            "https://raw.githubusercontent.com/planetsig/ufo-reports/master/csv-data/ufo-scrubbed.csv",
-            "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-06-25/ufo_sightings.csv"
+            "https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-06-25/ufo_sightings.csv",
+            "https://raw.githubusercontent.com/planetsig/ufo-reports/master/csv-data/ufo-scrubbed.csv"
         ]
 
     def collect(self) -> Dict:
@@ -52,14 +52,21 @@ class KaggleCollector(BaseCollector):
                     df = pd.read_csv(io.StringIO(response.text), nrows=1000)
 
                     for _, row in df.iterrows():
+                        # Handle multi-schema column aliases across Kaggle & mirror datasets
+                        city_val = row.get("city_area") or row.get("city") or "Unknown"
+                        shape_val = row.get("ufo_shape") or row.get("shape") or "Unknown"
+                        duration_val = row.get("described_encounter_length") or row.get("encounter_length") or row.get("duration (seconds)") or "Unknown"
+                        summary_val = row.get("description") or row.get("comments") or ""
+                        date_val = row.get("date_time") or row.get("datetime") or ""
+
                         raw_data = {
-                            "date_time": str(row.get("datetime") or row.get("date_time") or ""),
-                            "city": str(row.get("city", "Unknown")),
-                            "state": str(row.get("state", "Unknown")),
-                            "country": str(row.get("country", "USA")),
-                            "shape": str(row.get("shape", "Unknown")),
-                            "duration": str(row.get("duration (seconds)") or row.get("duration") or "Unknown"),
-                            "summary": str(row.get("comments") or row.get("description") or ""),
+                            "date_time": str(date_val),
+                            "city": str(city_val),
+                            "state": str(row.get("state") or "Unknown"),
+                            "country": str(row.get("country") or "USA"),
+                            "shape": str(shape_val),
+                            "duration": str(duration_val),
+                            "summary": str(summary_val),
                             "latitude": row.get("latitude"),
                             "longitude": row.get("longitude") or row.get("longitude ")
                         }

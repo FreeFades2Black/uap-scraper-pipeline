@@ -1,226 +1,166 @@
 # Databricks notebook source
-# /// script
-# [tool.databricks.environment]
-# environment_version = "5"
-# ///
-# DBTITLE 1,Gold Layer - UAP Summary Analytics
+# DBTITLE 1,Gold Layer - UAP Summary Analytics & Business Aggregations
 # MAGIC %md
-# MAGIC # 03 - Gold Layer Summary
-# MAGIC
-# MAGIC Aggregates silver GitHub event data into business-ready analytics tables.
-# MAGIC
-# MAGIC **Silver → Gold transformations:**
-# MAGIC - Event type distribution
-# MAGIC - Actor/user activity metrics
-# MAGIC - Repository activity summaries
-# MAGIC - Organization activity patterns
-# MAGIC - Time-series event trends
-# MAGIC - Ready for BI dashboards and analytics
+# MAGIC # 03 - Gold Layer Summary Analytics
+# MAGIC 
+# MAGIC Aggregates normalized Silver UAP sightings into analytics-ready Gold tables optimized for Lakeview dashboards and geospatial intelligence.
+# MAGIC 
+# MAGIC **Gold Analytics Tables Produced:**
+# MAGIC 1. `workspace.default.gold_uap_summary` - High-level KPIs and data quality scorecard
+# MAGIC 2. `workspace.default.gold_uap_by_location` - Geographic distribution by State & Country
+# MAGIC 3. `workspace.default.gold_uap_by_shape` - Morphology and phenomenon classification patterns
+# MAGIC 4. `workspace.default.gold_uap_timeline` - Decadal and annual temporal volume trends
+# MAGIC 5. `workspace.default.gold_uap_by_source` - Collector performance and reliability metrics
 
 # COMMAND ----------
 
 # DBTITLE 1,Configuration
-# Table paths
 SILVER_TABLE = "workspace.default.silver_uap_structured"
-GOLD_SUMMARY_TABLE = "workspace.default.gold_github_summary"
-GOLD_BY_ACTOR_TABLE = "workspace.default.gold_github_by_actor"
-GOLD_BY_REPO_TABLE = "workspace.default.gold_github_by_repo"
-GOLD_TIMELINE_TABLE = "workspace.default.gold_github_timeline"
-CHECKPOINT_PATH = "gs://uap-scraper-lab-2026-lakehouse-data/checkpoints/gold_github"
+GOLD_SUMMARY_TABLE = "workspace.default.gold_uap_summary"
+GOLD_BY_LOCATION_TABLE = "workspace.default.gold_uap_by_location"
+GOLD_BY_SHAPE_TABLE = "workspace.default.gold_uap_by_shape"
+GOLD_TIMELINE_TABLE = "workspace.default.gold_uap_timeline"
+GOLD_BY_SOURCE_TABLE = "workspace.default.gold_uap_by_source"
 
 print(f"Source: {SILVER_TABLE}")
-print(f"Target Summary: {GOLD_SUMMARY_TABLE}")
-print(f"Target By Actor: {GOLD_BY_ACTOR_TABLE}")
-print(f"Target By Repo: {GOLD_BY_REPO_TABLE}")
-print(f"Target Timeline: {GOLD_TIMELINE_TABLE}")
+print(f"Target Summary:     {GOLD_SUMMARY_TABLE}")
+print(f"Target By Location: {GOLD_BY_LOCATION_TABLE}")
+print(f"Target By Shape:    {GOLD_BY_SHAPE_TABLE}")
+print(f"Target Timeline:    {GOLD_TIMELINE_TABLE}")
+print(f"Target By Source:   {GOLD_BY_SOURCE_TABLE}")
 
 # COMMAND ----------
 
-# DBTITLE 1,BATCH: Overall Summary
+# DBTITLE 1,BATCH: 1. Overall Summary & Scorecard
 from pyspark.sql.functions import (
-    count, countDistinct, sum, avg, min, max, 
-    round as spark_round, current_timestamp, when, col
+    count, countDistinct, sum, min, max, round as spark_round, current_timestamp, when, col, year, avg
 )
 
-# Read from silver
 df_silver = spark.read.table(SILVER_TABLE)
 
-# Create overall summary
 df_summary = df_silver.agg(
-    count("*").alias("total_events"),
-    countDistinct("event_type").alias("unique_event_types"),
-    countDistinct("actor_login").alias("unique_actors"),
-    countDistinct("repo_name").alias("unique_repos"),
-    countDistinct("org_login").alias("unique_orgs"),
-    sum(when(col("has_actor"), 1).otherwise(0)).alias("events_with_actor"),
-    sum(when(col("has_repo"), 1).otherwise(0)).alias("events_with_repo"),
-    sum(when(col("has_org"), 1).otherwise(0)).alias("events_with_org"),
-    sum(when(col("is_public"), 1).otherwise(0)).alias("public_events"),
-    min("event_timestamp").alias("earliest_event"),
-    max("event_timestamp").alias("latest_event"),
+    count("*").alias("total_sightings"),
+    countDistinct("data_source").alias("active_data_sources"),
+    countDistinct("state").alias("unique_states"),
+    countDistinct("city").alias("unique_cities"),
+    countDistinct("shape_classified").alias("unique_shape_categories"),
+    sum(when(col("has_coordinates"), 1).otherwise(0)).alias("sightings_with_coordinates"),
+    sum(when(col("has_valid_timestamp"), 1).otherwise(0)).alias("sightings_with_valid_dates"),
+    sum(when(col("has_known_shape"), 1).otherwise(0)).alias("sightings_with_known_shape"),
+    min("sighting_timestamp").alias("earliest_sighting"),
+    max("sighting_timestamp").alias("latest_sighting"),
     current_timestamp().alias("_summary_generated_at")
-)
-
-# Add calculated metrics
-df_summary = df_summary.withColumn(
-    "data_completeness_pct",
-    spark_round((col("events_with_actor") / col("total_events")) * 100, 2)
 ).withColumn(
-    "public_event_pct",
-    spark_round((col("public_events") / col("total_events")) * 100, 2)
+    "coordinate_coverage_pct",
+    spark_round((col("sightings_with_coordinates") / col("total_sightings")) * 100, 2)
+).withColumn(
+    "shape_classification_pct",
+    spark_round((col("sightings_with_known_shape") / col("total_sightings")) * 100, 2)
 )
 
-# Write to gold summary table
 (
     df_summary.write
     .format("delta")
     .mode("overwrite")
     .saveAsTable(GOLD_SUMMARY_TABLE)
 )
-
-print(f"✅ Gold summary table created")
-print(f"   Table: {GOLD_SUMMARY_TABLE}")
-display(df_summary)
+print(f"✅ Gold Summary Table Created: {GOLD_SUMMARY_TABLE}")
 
 # COMMAND ----------
 
-# DBTITLE 1,BATCH: Actor Activity Aggregation
-from pyspark.sql.functions import count, countDistinct, min, max, round as spark_round, current_timestamp, col
-
-# Read from silver
-df_silver = spark.read.table(SILVER_TABLE)
-
-# Aggregate by actor (user)
-df_by_actor = (
+# DBTITLE 1,BATCH: 2. Geographic Aggregation (By State & Country)
+df_by_location = (
     df_silver
-    .filter(col("has_actor"))
-    .groupBy("actor_login", "actor_id", "actor_url")
+    .groupBy("country", "state")
     .agg(
-        count("*").alias("total_events"),
-        countDistinct("event_type").alias("unique_event_types"),
-        countDistinct("repo_name").alias("repos_touched"),
-        countDistinct("org_login").alias("orgs_involved"),
-        min("event_timestamp").alias("first_event"),
-        max("event_timestamp").alias("last_event")
+        count("*").alias("total_sightings"),
+        countDistinct("city").alias("unique_cities"),
+        avg("latitude").alias("avg_latitude"),
+        avg("longitude").alias("avg_longitude"),
+        sum(when(col("has_coordinates"), 1).otherwise(0)).alias("geocoded_sightings")
     )
     .withColumn("_aggregated_at", current_timestamp())
-    .orderBy(col("total_events").desc())
+    .orderBy(col("total_sightings").desc())
 )
 
-# Write to gold by actor table
 (
-    df_by_actor.write
+    df_by_location.write
     .format("delta")
     .mode("overwrite")
-    .saveAsTable(GOLD_BY_ACTOR_TABLE)
+    .saveAsTable(GOLD_BY_LOCATION_TABLE)
 )
-
-print(f"✅ Gold actor activity table created")
-print(f"   Table: {GOLD_BY_ACTOR_TABLE}")
-print(f"   Top 10 most active actors:")
-display(df_by_actor.limit(10))
+print(f"✅ Gold By Location Table Created: {GOLD_BY_LOCATION_TABLE}")
 
 # COMMAND ----------
 
-# DBTITLE 1,BATCH: Repository Activity Aggregation
-from pyspark.sql.functions import (
-    count, countDistinct, min, max, current_timestamp, col
-)
-
-# Read from silver
-df_silver = spark.read.table(SILVER_TABLE)
-
-# Aggregate by repository
-df_by_repo = (
+# DBTITLE 1,BATCH: 3. Shape & Morphology Distribution
+df_by_shape = (
     df_silver
-    .filter(col("has_repo"))
-    .groupBy("repo_name", "repo_id", "repo_url")
+    .groupBy("shape_classified")
     .agg(
-        count("*").alias("total_events"),
-        countDistinct("event_type").alias("unique_event_types"),
-        countDistinct("actor_login").alias("unique_contributors"),
-        min("event_timestamp").alias("first_event"),
-        max("event_timestamp").alias("last_event")
+        count("*").alias("sighting_count"),
+        countDistinct("state").alias("states_reported"),
+        countDistinct("data_source").alias("reporting_sources")
     )
+    .withColumn("pct_of_total", spark_round((col("sighting_count") / df_silver.count()) * 100, 2))
     .withColumn("_aggregated_at", current_timestamp())
-    .orderBy(col("total_events").desc())
+    .orderBy(col("sighting_count").desc())
 )
 
-# Write to gold by repo table
 (
-    df_by_repo.write
+    df_by_shape.write
     .format("delta")
     .mode("overwrite")
-    .saveAsTable(GOLD_BY_REPO_TABLE)
+    .saveAsTable(GOLD_BY_SHAPE_TABLE)
 )
-
-print(f"✅ Gold repository activity table created")
-print(f"   Table: {GOLD_BY_REPO_TABLE}")
-print(f"   Top 10 most active repos:")
-display(df_by_repo.limit(10))
+print(f"✅ Gold By Shape Table Created: {GOLD_BY_SHAPE_TABLE}")
 
 # COMMAND ----------
 
-# DBTITLE 1,BATCH: Daily Timeline Aggregation
-from pyspark.sql.functions import (
-    date_trunc, count, countDistinct, when, current_timestamp, col
-)
-
-# Read from silver
-df_silver = spark.read.table(SILVER_TABLE)
-
-# Aggregate by date (daily timeline)
+# DBTITLE 1,BATCH: 4. Historical Timeline Trends
 df_timeline = (
     df_silver
-    .filter(col("event_timestamp").isNotNull())
-    .withColumn("event_date", date_trunc("day", col("event_timestamp")))
-    .groupBy("event_date")
+    .filter(col("sighting_timestamp").isNotNull())
+    .withColumn("sighting_year", year(col("sighting_timestamp")))
+    .groupBy("sighting_year")
     .agg(
-        count("*").alias("daily_events"),
-        countDistinct("actor_login").alias("unique_actors"),
-        countDistinct("repo_name").alias("unique_repos"),
-        countDistinct("event_type").alias("unique_event_types"),
-        count(when(col("is_public"), 1)).alias("public_events"),
-        count(when(col("has_org"), 1)).alias("org_events")
+        count("*").alias("annual_sightings"),
+        countDistinct("state").alias("states_reporting"),
+        countDistinct("shape_classified").alias("distinct_shapes")
     )
     .withColumn("_aggregated_at", current_timestamp())
-    .orderBy("event_date")
+    .orderBy(col("sighting_year").asc())
 )
 
-# Write to gold timeline table
 (
     df_timeline.write
     .format("delta")
     .mode("overwrite")
     .saveAsTable(GOLD_TIMELINE_TABLE)
 )
-
-print(f"✅ Gold timeline table created")
-print(f"   Table: {GOLD_TIMELINE_TABLE}")
-print(f"   Sample timeline data:")
-display(df_timeline.limit(10))
+print(f"✅ Gold Timeline Table Created: {GOLD_TIMELINE_TABLE}")
 
 # COMMAND ----------
 
-# DBTITLE 1,Streaming Cell (Not Used)
-# This cell is disabled - the BATCH aggregation cells above are used by the scheduled job
-print("ℹ️ Streaming mode disabled for scheduled job execution")
+# DBTITLE 1,BATCH: 5. Collector Reliability & Source Quality
+df_by_source = (
+    df_silver
+    .groupBy("data_source")
+    .agg(
+        count("*").alias("total_records"),
+        sum(when(col("has_coordinates"), 1).otherwise(0)).alias("with_coordinates"),
+        sum(when(col("has_valid_timestamp"), 1).otherwise(0)).alias("with_valid_dates"),
+        sum(when(col("has_known_shape"), 1).otherwise(0)).alias("with_known_shape")
+    )
+    .withColumn("quality_score_pct", spark_round(((col("with_coordinates") + col("with_valid_dates") + col("with_known_shape")) / (col("total_records") * 3)) * 100, 2))
+    .withColumn("_aggregated_at", current_timestamp())
+    .orderBy(col("total_records").desc())
+)
 
-# COMMAND ----------
-
-# DBTITLE 1,Verify Gold Tables
-# MAGIC %sql
-# MAGIC -- Overall Summary
-# MAGIC SELECT * FROM workspace.default.gold_github_summary;
-# MAGIC
-# MAGIC -- Top 10 Most Active Actors
-# MAGIC SELECT * FROM workspace.default.gold_github_by_actor ORDER BY total_events DESC LIMIT 10;
-# MAGIC
-# MAGIC -- Top 10 Most Active Repos
-# MAGIC SELECT * FROM workspace.default.gold_github_by_repo ORDER BY total_events DESC LIMIT 10;
-# MAGIC
-# MAGIC -- Recent Timeline (Last 10 Days)
-# MAGIC SELECT * FROM workspace.default.gold_github_timeline ORDER BY event_date DESC LIMIT 10;
-
-# COMMAND ----------
-
+(
+    df_by_source.write
+    .format("delta")
+    .mode("overwrite")
+    .saveAsTable(GOLD_BY_SOURCE_TABLE)
+)
+print(f"✅ Gold By Source Table Created: {GOLD_BY_SOURCE_TABLE}")
