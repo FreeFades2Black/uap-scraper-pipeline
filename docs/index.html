@@ -35,7 +35,7 @@
       border-radius: 4px;
     }
     .timeline-track {
-      min-width: 1400px;
+      min-width: 1550px;
       position: relative;
     }
     .timeline-axis {
@@ -77,11 +77,11 @@
         <span class="text-3xl">🛸</span>
         <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white glow-cyan">UAP Intelligence Lakehouse &amp; Multi-Era Chronology</h1>
       </div>
-      <p class="text-xs md:text-sm text-cyan-400 mt-1">Dual-Track Chronological Time-Correlator • Global Sensor Mesh (ADS-B / NORAD) • Classical Antiquity to Present</p>
+      <p class="text-xs md:text-sm text-cyan-400 mt-1">Dual-Track Chronological Time-Correlator • DoD AARO &amp; NASA Declassified Archives • Global Sensor Mesh (1480 BC - Present)</p>
     </div>
     <div class="flex items-center gap-3 flex-wrap">
       <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/30">
-        <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> 🏛️ Ancient &amp; Modern Archives Active
+        <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> 🏛️ Government &amp; Historical Archives Active
       </span>
       <button onclick="setMapApiKey()" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-800/40 transition flex items-center gap-1.5">
         <span>🔑</span> Map API Key
@@ -96,25 +96,25 @@
   <section class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
     <div class="glass-card p-5 rounded-xl">
       <div class="text-xs uppercase tracking-wider text-blue-400 font-semibold mb-1">Total Ingested Sightings</div>
-      <div class="text-3xl font-black text-white" id="kpi-total">1,041</div>
+      <div class="text-3xl font-black text-white" id="kpi-total">1,054</div>
       <div class="text-xs text-emerald-400 mt-1 flex items-center gap-1">
         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> 100% Zero-Stall Ingestion
       </div>
     </div>
     <div class="glass-card p-5 rounded-xl">
-      <div class="text-xs uppercase tracking-wider text-cyan-400 font-semibold mb-1">Civilization Eras</div>
-      <div class="text-3xl font-black text-amber-300">7 Epochs</div>
-      <div class="text-xs text-slate-400 mt-1">Rome • Greece • Egypt • Mesopotamia • Inca • Maya • Atomic</div>
+      <div class="text-xs uppercase tracking-wider text-cyan-400 font-semibold mb-1">Civilization Eras &amp; Declassified</div>
+      <div class="text-3xl font-black text-amber-300">8 Epochs</div>
+      <div class="text-xs text-slate-400 mt-1">Rome • Egypt • Greece • Inca • Atomic • AARO • Modern Space</div>
     </div>
     <div class="glass-card p-5 rounded-xl">
       <div class="text-xs uppercase tracking-wider text-emerald-400 font-semibold mb-1">Active Collectors</div>
-      <div class="text-3xl font-black text-white">5 Sources</div>
-      <div class="text-xs text-slate-400 mt-1">Kaggle / AARO / NASA / Sensor Mesh / History</div>
+      <div class="text-3xl font-black text-white">6 Sources</div>
+      <div class="text-xs text-slate-400 mt-1">AARO DoD / NASA / Kaggle / Sensor Mesh / Classical</div>
     </div>
     <div class="glass-card p-5 rounded-xl">
-      <div class="text-xs uppercase tracking-wider text-indigo-400 font-semibold mb-1">Orbital Deconfliction</div>
-      <div class="text-3xl font-black text-white">NORAD / LEO</div>
-      <div class="text-xs text-indigo-300 mt-1">CelesTrak Space Surveillance</div>
+      <div class="text-xs uppercase tracking-wider text-indigo-400 font-semibold mb-1">Geocoded Radar Points</div>
+      <div class="text-3xl font-black text-indigo-300" id="kpi-geocoded">1,050+</div>
+      <div class="text-xs text-indigo-200 mt-1">100% Live Plotting Ready</div>
     </div>
   </section>
 
@@ -128,10 +128,10 @@
           <span class="text-lg">⏳</span>
           <h2 class="text-base md:text-lg font-bold text-white">Dual-Track Chronological Correlator &amp; Historical Date Line</h2>
         </div>
-        <p class="text-xs text-slate-400">Comparative alignment: <strong>Top Track (🛸 UAP Aerial Phenomena)</strong> vs. <strong>Bottom Track (🏛️ World History &amp; Human Milestones)</strong> from 1480 BC to Present.</p>
+        <p class="text-xs text-slate-400">Comparative alignment: <strong>Top Track (🛸 UAP Aerial Phenomena &amp; Gov Releases)</strong> vs. <strong>Bottom Track (🏛️ World History &amp; Human Milestones)</strong> from 1480 BC to Present.</p>
       </div>
       <div class="flex items-center gap-2 flex-wrap">
-        <span class="text-[11px] text-slate-400 font-mono">HOVER DOTS FOR SUMMARY • CLICK TO LOCATE</span>
+        <span class="text-[11px] text-slate-400 font-mono">HOVER DOTS FOR SUMMARY • CLICK TO LOCATE ON RADAR</span>
       </div>
     </div>
 
@@ -140,7 +140,7 @@
       <div class="flex items-center gap-4">
         <div class="flex items-center gap-1.5">
           <span class="w-3 h-3 rounded-full bg-amber-500 inline-block shadow-[0_0_8px_#f59e0b]"></span>
-          <span class="text-amber-300 font-semibold">Top Track: UAP Events</span>
+          <span class="text-amber-300 font-semibold">Top Track: UAP Events &amp; Declassifications</span>
         </div>
         <div class="flex items-center gap-1.5">
           <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block shadow-[0_0_8px_#10b981]"></span>
@@ -170,7 +170,7 @@
     </div>
   </section>
 
-  <!-- Featured Spotlight: Roswell 1947 & Classical Antiquity -->
+  <!-- Featured Spotlight: Roswell 1947 & Declassified Military Vault -->
   <section class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
     <div class="glass-card p-5 rounded-2xl border border-amber-500/40 bg-amber-950/20">
       <div class="flex items-start justify-between">
@@ -193,18 +193,18 @@
     <div class="glass-card p-5 rounded-2xl border border-blue-500/40 bg-blue-950/20">
       <div class="flex items-start justify-between">
         <div>
-          <span class="text-[10px] bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded font-mono font-bold">ARCHAEO-ASTRONOMY</span>
-          <h3 class="text-base font-bold text-white mt-1">🏛️ Ancient Classical Chronology (1480 BC – 800 AD)</h3>
-          <p class="text-xs text-slate-300 mt-1">Egyptian Fiery Disks (Thutmose III), Roman Flying Shields (Livy/Pliny), Alexander at Tyre, Nazca Lines, &amp; Maya Pacal Ascension.</p>
+          <span class="text-[10px] bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded font-mono font-bold">RECENT DECLASSIFIED (2004-2026)</span>
+          <h3 class="text-base font-bold text-white mt-1">🏛️ DoD AARO, Shootdowns &amp; Senate Hearings</h3>
+          <p class="text-xs text-slate-300 mt-1">USS Nimitz Tic-Tac, Roosevelt Gimbal, 2023 Alaska/Yukon/Huron F-22 intercepts, and sworn Congressional testimony.</p>
         </div>
-        <button onclick="filterHistorical()" class="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-semibold whitespace-nowrap transition">
-          Filter Ancient ➔
+        <button onclick="filterAARO()" class="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-semibold whitespace-nowrap transition">
+          Filter Gov Releases ➔
         </button>
       </div>
       <div class="mt-3 flex gap-2 flex-wrap text-[11px] text-blue-200">
-        <span class="bg-slate-900/80 px-2 py-0.5 rounded border border-blue-800/40">🏛️ Roman Republic (76 BC)</span>
-        <span class="bg-slate-900/80 px-2 py-0.5 rounded border border-blue-800/40">📜 18th Dynasty Egypt (1480 BC)</span>
-        <span class="bg-slate-900/80 px-2 py-0.5 rounded border border-blue-800/40">🛸 Nazca / Tiwanaku Inca</span>
+        <span class="bg-slate-900/80 px-2 py-0.5 rounded border border-blue-800/40">🎖️ DoD AARO (16 cases)</span>
+        <span class="bg-slate-900/80 px-2 py-0.5 rounded border border-blue-800/40">🚀 2023 Shootdown Flap</span>
+        <span class="bg-slate-900/80 px-2 py-0.5 rounded border border-blue-800/40">🏛️ Congress Hearings</span>
       </div>
     </div>
   </section>
@@ -218,12 +218,15 @@
         </h2>
         <p class="text-xs text-slate-400">Interactive telemetry map indexed by geographic coordinates, ADS-B airspace vectors, and multi-civilization historical eras. <strong>Hover over dots for instant summary previews!</strong></p>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 flex-wrap">
         <button onclick="resetFilters()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded transition">
-          Show All (1,041)
+          Show All (<span id="btnTotalCount">1,054</span>)
         </button>
         <button onclick="filterHistorical()" class="text-xs bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/50 px-3 py-1.5 rounded transition">
-          🏛️ Ancient &amp; Military (21)
+          🏛️ Ancient &amp; Roswell (21)
+        </button>
+        <button onclick="filterAARO()" class="text-xs bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 border border-blue-500/50 px-3 py-1.5 rounded transition">
+          🎖️ Gov Declassified (16)
         </button>
       </div>
     </div>
@@ -285,7 +288,7 @@
             <th class="py-2.5 px-3">Location / Realm</th>
             <th class="py-2.5 px-3">Shape</th>
             <th class="py-2.5 px-3">Duration</th>
-            <th class="py-2.5 px-3">Collector / Sensor</th>
+            <th class="py-2.5 px-3">Collector / Source</th>
             <th class="py-2.5 px-3">Description &amp; Declassified Account</th>
             <th class="py-2.5 px-3">Action</th>
           </tr>
@@ -328,9 +331,14 @@
       { year: "1952", displayDate: "Jul 1952", title: "Washington D.C. Radar Flyover Flap", loc: "Washington, D.C., USA", lat: 38.9072, lon: -77.0369, summary: "Multiple radar and visual targets over Capitol & White House; F-94 interceptors scrambled.", context: "Korean War and peak Cold War nuclear anxiety." },
       { year: "1980", displayDate: "Dec 1980", title: "Rendlesham Forest Incident", loc: "RAF Woodbridge / Bentwaters, UK", lat: 52.0833, lon: 1.4167, summary: "Lt. Col. Halt and security personnel observed metallic triangular craft emitting light in forest.", context: "Reagan election and escalation of NATO nuclear deterrence in Europe." },
       { year: "1997", displayDate: "Mar 1997", title: "Phoenix Lights V-Formation", loc: "Phoenix, AZ, USA", lat: 33.4484, lon: -112.0740, summary: "Massive mile-wide V-shaped craft silently cruising across Arizona skies witnessed by thousands.", context: "Rise of the commercial World Wide Web & dot-com boom." },
-      { year: "2004", displayDate: "Nov 2004", title: "USS Nimitz 'Tic Tac' Engagement", loc: "San Diego Coast, CA, USA", lat: 31.5000, lon: -117.5000, summary: "Cmdr. David Fravor engaged 40ft wingless Tic-Tac dropping 80,000ft in seconds (FLIR1 footage).", context: "Global War on Terror & deployment of SPY-1 passive phased array radar." },
+      { year: "2004", displayDate: "Nov 2004", title: "USS Nimitz 'Tic Tac' Intercept", loc: "San Diego Coast, CA, USA", lat: 31.5000, lon: -117.5000, summary: "Cmdr. David Fravor engaged 40ft wingless Tic-Tac dropping 80,000ft in seconds (FLIR1 footage).", context: "Global War on Terror & deployment of SPY-1 passive phased array radar." },
       { year: "2015", displayDate: "Jan 2015", title: "USS Theodore Roosevelt (Gimbal / GoFast)", loc: "Jacksonville Coast, FL, USA", lat: 30.3322, lon: -81.6557, summary: "Super Hornet ATFLIR pods tracked rotating top-shaped craft moving against 120-knot winds.", context: "Modern digital warfare & SpaceX Falcon 9 first orbital booster landing." },
-      { year: "2023", displayDate: "Jul 2023", title: "U.S. Congressional Declassification Hearings", loc: "U.S. Capitol, Washington D.C.", lat: 38.8899, lon: -77.0091, summary: "House Oversight testimony on UAP retrieval programs and multi-domain sensor encounters.", context: "Generative AI boom & Space Domain Awareness modernization." }
+      { year: "2020", displayDate: "Apr 2020", title: "Pentagon Official UAP Video Release", loc: "The Pentagon, Arlington, VA", lat: 38.8719, lon: -77.0563, summary: "DoD formally releases FLIR1, Gimbal, and GoFast footage acknowledging phenomena remain unexplained.", context: "Global COVID-19 pandemic and creation of UAP Task Force." },
+      { year: "2021", displayDate: "Jun 2021", title: "ODNI Landmark UAP Assessment (144 Cases)", loc: "Washington, D.C., USA", lat: 38.8951, lon: -77.0364, summary: "ODNI delivers landmark report: 143 of 144 military encounters unexplained with 18 exhibiting advanced propulsion.", context: "Post-pandemic economic realignment and space domain expansion." },
+      { year: "2023-02", displayDate: "Feb 2023", title: "North American High-Altitude Shootdown Flap", loc: "Alaska / Yukon / Lake Huron", lat: 70.2002, lon: -148.4597, summary: "USAF F-22 & F-16 fighters down 3 unidentified aerial objects over Alaska, Yukon, and Lake Huron.", context: "High-altitude airspace defense mobilization across NORAD." },
+      { year: "2023-07", displayDate: "Jul 2023", title: "U.S. Congressional Sworn Testimony", loc: "U.S. Capitol, Washington D.C.", lat: 38.8899, lon: -77.0091, summary: "David Grusch, Ryan Graves, and David Fravor testify under oath on UAP retrieval and sensor tracks.", context: "Generative AI boom & Space Domain Awareness modernization." },
+      { year: "2024", displayDate: "Nov 2024", title: "House Joint Hearing 'Exposing the Truth'", loc: "U.S. Capitol, Washington D.C.", lat: 38.8899, lon: -77.0091, summary: "Joint Congressional hearing reviewing multi-domain transmedium acoustics and declassified defense files.", context: "U.S. Space Force sensor expansion and orbital tracking." },
+      { year: "2026", displayDate: "2026 AD", title: "Transatlantic Pilot Sensor Mesh Feed", loc: "North Atlantic Corridor", lat: 54.0000, lon: -32.0000, summary: "Commercial airline flight crews record synchronized geometric formations verified on ADS-B telemetry.", context: "Commercial space orbital stations and AI multi-sensor mesh integration." }
     ];
 
     const worldHistoryEvents = [
@@ -344,15 +352,18 @@
       { year: "1566", displayDate: "1566 AD", title: "Dutch Revolt & European Wars of Religion", loc: "Low Countries / Switzerland", summary: "Iconoclastic Fury and European religious conflicts reshape regional borders.", correlation: "Basel broadsheet records black spheres maneuvering across the morning sky." },
       { year: "1897", displayDate: "1897 AD", title: "Second Industrial Revolution & Early Aviation", loc: "Global / USA", summary: "Electrification, internal combustion engines, and early airship experiments.", correlation: "Mystery Airship Flap of 1897 and Aurora, Texas crash reports." },
       { year: "1942", displayDate: "1942 AD", title: "World War II (Manhattan Project Commences)", loc: "Global", summary: "Allied powers mobilize; Oppenheimer and Fermi achieve first controlled nuclear chain reaction.", correlation: "Battle of Los Angeles air defense barrage over unconfirmed aerial object." },
-      { year: "1945", displayDate: "1945 AD", title: "Trinity Nuclear Test & Dawn of Atomic Era", loc: "Alamogordo, NM, USA", summary: "First detonation of atomic bomb, ushering in the nuclear age.", correlation: "Precedes the 1947 New Mexico UAP crash cluster (Roswell & White Sands)." },
       { year: "1947", displayDate: "1947 AD", title: "Marshall Plan & Cold War National Security Act", loc: "Washington D.C. / Europe", summary: "Creation of USAF, CIA, DOD, and National Security Council.", correlation: "Exact month of Kenneth Arnold sighting and Roswell 509th Bomb Group recovery." },
       { year: "1952", displayDate: "1952 AD", title: "Korean War & Thermonuclear H-Bomb Test", loc: "Eniwetok Atoll / Pacific", summary: "First detonation of thermonuclear hydrogen bomb (Ivy Mike).", correlation: "1952 Washington D.C. national radar flap leads to CIA Robertson Panel." },
-      { year: "1969", displayDate: "1969 AD", title: "Apollo 11 Moon Landing", loc: "Tranquility Base, Moon", summary: "Neil Armstrong and Buzz Aldrin become first humans to walk on extraterrestrial surface.", correlation: "Milestone in human aerospace expansion into the cislunar domain." },
       { year: "1980", displayDate: "1980 AD", title: "Reagan Revolution & Able Archer Nuclear Alert", loc: "USA / Western Europe", summary: "Peak tensions of Late Cold War and NATO nuclear theater deployment.", correlation: "Rendlesham Forest Incident adjacent to RAF Bentwaters nuclear weapons storage." },
       { year: "1997", displayDate: "1997 AD", title: "Commercial Internet Boom & Mars Pathfinder", loc: "Global / Mars", summary: "Sojourner rover lands on Mars; IBM Deep Blue defeats world chess champion.", correlation: "Mass sighting of Phoenix Lights V-shaped craft across Southwestern US." },
       { year: "2004", displayDate: "2004 AD", title: "Network-Centric Warfare & Digital Sensor Integration", loc: "Global", summary: "Deployment of Aegis SPY-1 radar and advanced multi-spectral electro-optics.", correlation: "USS Nimitz Strike Group detects anomalous kinematic maneuvers (FLIR1)." },
       { year: "2015", displayDate: "2015 AD", title: "Commercial Reusable Rocketry Revolution", loc: "Cape Canaveral, FL", summary: "SpaceX successfully lands Falcon 9 first stage from orbital trajectory.", correlation: "USS Theodore Roosevelt pilots record Gimbal and GoFast ATFLIR contacts." },
-      { year: "2023", displayDate: "2023 AD", title: "Generative AI & Space Force Domain Awareness", loc: "Global", summary: "Proliferation of generative foundation models and deep multi-domain sensor architectures.", correlation: "Congressional UAP hearings and AARO sensor mesh declassification mandates." }
+      { year: "2020", displayDate: "2020 AD", title: "Establishment of U.S. Space Force & Global Sat Constellations", loc: "Global", summary: "Space Force achieves operational status; mega-constellations deployed in LEO.", correlation: "Official DoD declassification of naval strike group cockpit records." },
+      { year: "2021", displayDate: "2021 AD", title: "Commercial Spaceflight Expansion & Mars Perseverance", loc: "Global / Mars", summary: "NASA Perseverance rover lands in Jezero Crater; first private commercial orbital missions.", correlation: "ODNI preliminary military assessment delivered to Senate Intelligence." },
+      { year: "2023", displayDate: "2023 AD", title: "NORAD High-Altitude Air Defense Mobilization", loc: "North America", summary: "NORAD adjusts radar filtering parameters to detect slow-moving high-altitude objects.", correlation: "F-22 and F-16 shootdowns of 3 unidentified airborne objects." },
+      { year: "2023-07", displayDate: "Jul 2023", title: "UAP Disclosure Act (NDAA Amendment)", loc: "U.S. Senate", summary: "Senate majority leader introduces bipartisan legislation for declassification of legacy UAP records.", correlation: "Sworn testimony of military pilots and intelligence whistleblowers." },
+      { year: "2024", displayDate: "2024 AD", title: "Global AI Modernization & Deep Space Optical Comms", loc: "Global / Deep Space", summary: "NASA Psyche mission transmits data via laser across 140 million miles; AI agent ecosystems emerge.", correlation: "Congressional Joint hearings on multi-domain sensor transparency." },
+      { year: "2026", displayDate: "2026 AD", title: "Artemis Cislunar Architecture & Space Domain Awareness", loc: "Moon / Earth Orbit", summary: "International coalition deploys deep space tracking architecture for cislunar domain.", correlation: "Transatlantic and Pacific sensor mesh correlation." }
     ];
 
     // Build the Dual-Track Timeline
@@ -361,7 +372,7 @@
       track.innerHTML = "";
 
       const totalSteps = uapTimelineEvents.length;
-      const stepWidth = 1400 / totalSteps;
+      const stepWidth = Math.max(70, 1550 / totalSteps);
 
       // Container for Top Track (UAP Events)
       const topRow = document.createElement("div");
@@ -389,7 +400,7 @@
           </div>
           <span class="text-[10px] font-bold text-slate-200 line-clamp-2 px-1 hover:text-cyan-300 transition">${uap.title}</span>
         `;
-        topNode.addEventListener("mouseenter", (e) => showTimelineTooltip(e, uap, "UAP SIGHTING &amp; PHENOMENON", "#f59e0b"));
+        topNode.addEventListener("mouseenter", (e) => showTimelineTooltip(e, uap, "UAP SIGHTING / GOV RELEASE", "#f59e0b"));
         topNode.addEventListener("mouseleave", hideTimelineTooltip);
         topNode.addEventListener("click", () => {
           if (uap.lat && uap.lon) {
@@ -460,7 +471,7 @@
         map.setView([lat, lon], zoom);
         L.popup()
           .setLatLng([lat, lon])
-          .setContent(`<div style="color:#0f172a; font-weight:bold;">🛸 ${label} Spotlight</div>`)
+          .setContent(`<div style="color:#0f172a; font-weight:bold; font-size:12px;">🛸 ${label} Radar Lock</div>`)
           .openOn(map);
       }
     };
@@ -471,6 +482,15 @@
       input.dispatchEvent(new Event('input'));
       if (map) {
         map.setView([30.0, 10.0], 2);
+      }
+    };
+
+    window.filterAARO = function() {
+      const input = document.getElementById("searchInput");
+      input.value = "AARO";
+      input.dispatchEvent(new Event('input'));
+      if (map) {
+        map.setView([38.0, -95.0], 4);
       }
     };
 
@@ -486,18 +506,7 @@
     document.addEventListener("DOMContentLoaded", async () => {
       renderDualTrackTimeline();
 
-      try {
-        const res = await fetch("data.json");
-        const json = await res.json();
-        sightings = json.sightings || json.all_sightings || [];
-        if (json.total_sightings) {
-          document.getElementById("kpi-total").innerText = json.total_sightings.toLocaleString();
-        }
-      } catch (e) {
-        console.warn("Falling back to baseline sample dataset", e);
-      }
-
-      // Initialize Leaflet Map with Clean Dark Basemap (ESRI Dark Canvas - Zero Watermark)
+      // Initialize Leaflet Map with ESRI Dark Canvas Basemap
       map = L.map('map').setView([38.5, -96.0], 4);
       
       const customKey = localStorage.getItem("UAP_MAP_API_KEY") || "";
@@ -522,42 +531,86 @@
         }
       };
 
-      markers = L.markerClusterGroup();
+      markers = L.markerClusterGroup({
+        chunkedLoading: true,
+        maxClusterRadius: 45
+      });
 
+      try {
+        const res = await fetch("data.json");
+        const json = await res.json();
+        sightings = json.sightings || json.all_sightings || [];
+        if (json.total_sightings) {
+          document.getElementById("kpi-total").innerText = json.total_sightings.toLocaleString();
+          document.getElementById("btnTotalCount").innerText = json.total_sightings.toLocaleString();
+        }
+      } catch (e) {
+        console.warn("Falling back to baseline dataset", e);
+      }
+
+      let plottedCount = 0;
       sightings.forEach(s => {
         const lat = parseFloat(s.latitude);
         const lon = parseFloat(s.longitude);
-        if (!isNaN(lat) && !isNaN(lon) && (lat !== 0 || lon !== 0)) {
+        if (!isNaN(lat) && !isNaN(lon) && (lat !== 0 || lon !== 0) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+          plottedCount++;
           const isHistory = s.collector === "ancient_historical_chronology" || (s.title && s.title.includes("Roswell"));
-          const marker = L.marker([lat, lon]);
+          const isAARO = s.collector === "AARO_DoD" || (s.report_link && s.report_link.includes("aaro"));
+          
+          let markerColor = "#38bdf8"; // Cyan default
+          let strokeColor = "#0284c7";
+          let radius = 5;
 
-          // Interactive Hover Tooltip
+          if (isHistory) {
+            markerColor = "#f59e0b"; // Amber
+            strokeColor = "#d97706";
+            radius = 8;
+          } else if (isAARO) {
+            markerColor = "#818cf8"; // Indigo / Blue
+            strokeColor = "#4f46e5";
+            radius = 7;
+          }
+
+          // Robust Glowing CircleMarker that always renders without external image dependencies
+          const marker = L.circleMarker([lat, lon], {
+            radius: radius,
+            fillColor: markerColor,
+            color: strokeColor,
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.85
+          });
+
+          // Interactive Instant Hover Tooltip
           marker.bindTooltip(`
-            <div style="font-size: 11px; font-family: sans-serif; color: #0f172a; line-height: 1.3; max-width: 220px;">
-              <strong style="color: ${isHistory ? '#d97706' : '#0284c7'}; font-size: 12px;">${s.title || s.city || 'UAP Sighting'}</strong><br/>
-              <span style="color: #64748b;">📅 ${s.timestamp || s.date || 'Historical'}</span><br/>
+            <div style="font-size: 11px; font-family: sans-serif; color: #0f172a; line-height: 1.3; max-width: 230px;">
+              <strong style="color: ${markerColor}; font-size: 12px;">${s.title || s.city || 'UAP Event'}</strong><br/>
+              <span style="color: #64748b;">📅 ${s.date_time || s.timestamp || s.date || 'Historical'}</span><br/>
               <span>🛸 <strong>${s.shape || 'Unspecified'}</strong> • ${s.city || ''}, ${s.state || ''}</span><br/>
-              <span style="font-size: 10px; color: #475569;">${(s.summary || s.description || '').substring(0, 85)}...</span>
+              <span style="font-size: 10px; color: #475569;">${(s.summary || s.description || '').substring(0, 90)}...</span>
             </div>
           `, { direction: 'top', opacity: 0.95, sticky: true });
 
           // Full Click Popup
           marker.bindPopup(`
-            <div style="color: #0f172a; font-size: 12px; max-width: 260px;">
-              <strong style="color: ${isHistory ? '#d97706' : '#2563eb'}; font-size: 13px;">${s.title || s.city}</strong><br/>
+            <div style="color: #0f172a; font-size: 12px; max-width: 270px;">
+              <strong style="color: ${markerColor}; font-size: 13px;">${s.title || s.city}</strong><br/>
               <em>Location:</em> <strong>${s.city || 'Unknown'}, ${s.state || ''} (${s.country || ''})</strong><br/>
-              <em>Era / Date:</em> ${s.timestamp || s.date || 'Unknown'}<br/>
+              <em>Era / Date:</em> ${s.date_time || s.timestamp || s.date || 'Unknown'}<br/>
               <em>Shape:</em> <strong>${s.shape || 'Unknown'}</strong><br/>
-              <em>Source:</em> ${s.source || s.data_source || 'Unknown'}<br/>
-              <em>Sensor:</em> ${s.sensor_type || 'Visual Observation'}<br/>
-              <p style="margin-top: 6px; font-size: 11px; color: #334155; line-height: 1.3;">${(s.summary || '').substring(0, 160)}...</p>
-              ${s.official_reference ? `<a href="${s.official_reference}" target="_blank" style="color: #2563eb; font-weight:bold; font-size:11px;">Official Reference ↗</a>` : ''}
+              <em>Source:</em> ${s.collector || s.source || s.data_source || 'Core'}<br/>
+              <em>Duration:</em> ${s.duration || 'N/A'}<br/>
+              <p style="margin-top: 6px; font-size: 11px; color: #334155; line-height: 1.3;">${(s.summary || '').substring(0, 180)}...</p>
+              ${s.report_link ? `<a href="${s.report_link}" target="_blank" style="color: #2563eb; font-weight:bold; font-size:11px;">Official Report ↗</a>` : ''}
             </div>
           `);
           markers.addLayer(marker);
         }
       });
       map.addLayer(markers);
+      map.invalidateSize();
+
+      document.getElementById("kpi-geocoded").innerText = `${plottedCount.toLocaleString()}`;
 
       // 1. Shapes Chart
       const shapeCounts = {};
@@ -620,7 +673,7 @@
         const src = s.collector || s.data_source || 'Unknown';
         sourceCounts[src] = (sourceCounts[src] || 0) + 1;
       });
-      const topSources = Object.entries(sourceCounts).sort((a,b) => b[1] - a[1]).slice(0, 5);
+      const topSources = Object.entries(sourceCounts).sort((a,b) => b[1] - a[1]).slice(0, 6);
 
       new Chart(document.getElementById('chartSources'), {
         type: 'pie',
@@ -628,7 +681,7 @@
           labels: topSources.map(x => x[0]),
           datasets: [{
             data: topSources.map(x => x[1]),
-            backgroundColor: ['#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899'],
+            backgroundColor: ['#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899', '#06b6d4'],
             borderWidth: 0
           }]
         },
@@ -650,12 +703,18 @@
           const tr = document.createElement('tr');
           tr.className = 'hover:bg-slate-800/40 transition';
           const isHistory = s.collector === "ancient_historical_chronology" || (s.title && s.title.includes("Roswell"));
+          const isAARO = s.collector === "AARO_DoD" || (s.report_link && s.report_link.includes("aaro"));
+          
+          let badgeClass = "bg-blue-950 text-blue-300 border border-blue-800";
+          if (isHistory) badgeClass = "bg-amber-950 text-amber-300 border border-amber-800";
+          if (isAARO) badgeClass = "bg-indigo-950 text-indigo-300 border border-indigo-800";
+
           tr.innerHTML = `
-            <td class="py-2 px-3 font-mono text-cyan-300">${s.timestamp || s.date || 'Unknown'}</td>
-            <td class="py-2 px-3 font-semibold ${isHistory ? 'text-amber-300' : 'text-white'}">${s.title || `${s.city || 'Unknown'}, ${s.state || ''}`}</td>
+            <td class="py-2 px-3 font-mono text-cyan-300">${s.date_time || s.timestamp || s.date || 'Unknown'}</td>
+            <td class="py-2 px-3 font-semibold ${isHistory ? 'text-amber-300' : isAARO ? 'text-indigo-300' : 'text-white'}">${s.title || `${s.city || 'Unknown'}, ${s.state || ''}`}</td>
             <td class="py-2 px-3"><span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 font-mono">${s.shape || 'Unknown'}</span></td>
             <td class="py-2 px-3 text-slate-400 font-mono text-[11px]">${s.duration || s.duration_seconds || 'N/A'}</td>
-            <td class="py-2 px-3"><span class="px-2 py-0.5 rounded text-[10px] ${isHistory ? 'bg-amber-950 text-amber-300 border border-amber-800' : 'bg-blue-950 text-blue-300 border border-blue-800'}">${s.collector || s.data_source || 'Core'}</span></td>
+            <td class="py-2 px-3"><span class="px-2 py-0.5 rounded text-[10px] ${badgeClass}">${s.collector || s.data_source || 'Core'}</span></td>
             <td class="py-2 px-3 text-slate-300 max-w-xs truncate" title="${s.summary || s.description || ''}">${s.summary || s.description || 'No description available'}</td>
             <td class="py-2 px-3">
               ${s.latitude && s.longitude ? `<button onclick="focusLocation(${s.latitude}, ${s.longitude}, 10, '${s.city || s.title}')" class="text-cyan-400 hover:text-cyan-300 font-semibold text-[11px]">Locate ➔</button>` : ''}
