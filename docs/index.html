@@ -28,11 +28,11 @@
       overflow: hidden;
       background-color: #02040a !important;
       background-image: 
-        linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px) !important;
+        linear-gradient(rgba(0, 240, 255, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 240, 255, 0.06) 1px, transparent 1px) !important;
       background-size: 32px 32px !important;
       border: 1.5px solid rgba(0, 240, 255, 0.35);
-      box-shadow: 0 0 25px rgba(0, 240, 255, 0.15), inset 0 0 40px rgba(0, 0, 0, 0.9);
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.2), inset 0 0 50px rgba(0, 0, 0, 0.95);
     }
 
     /* Glowing State & Geography Vector Lines */
@@ -41,23 +41,23 @@
       stroke-width: 1.8px !important;
       stroke-opacity: 0.95 !important;
       fill: #030712 !important;
-      fill-opacity: 0.68 !important;
+      fill-opacity: 0.65 !important;
       filter: drop-shadow(0 0 6px #00f0ff) drop-shadow(0 0 14px rgba(0, 240, 255, 0.65)) !important;
       transition: all 0.25s ease !important;
     }
     path.glowing-state-border:hover {
       stroke: #00ff9d !important;
-      stroke-width: 2.5px !important;
-      fill: #081a2e !important;
+      stroke-width: 2.6px !important;
+      fill: #06192e !important;
       fill-opacity: 0.82 !important;
-      filter: drop-shadow(0 0 10px #00ff9d) drop-shadow(0 0 20px rgba(0, 255, 157, 0.85)) !important;
+      filter: drop-shadow(0 0 10px #00ff9d) drop-shadow(0 0 22px rgba(0, 255, 157, 0.85)) !important;
     }
 
     /* Cyberpunk Mountain Hillshade Elevation Overlay */
     .neon-hillshade-tiles {
       filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(2.8) drop-shadow(0 0 4px #00f0ff) !important;
       mix-blend-mode: screen !important;
-      opacity: 0.38 !important;
+      opacity: 0.42 !important;
     }
 
     /* Neon Country Boundaries & Coastlines */
@@ -108,7 +108,7 @@
 
     /* Glassmorphic Cyberpunk Cluster Bubbles */
     .cyber-cluster {
-      background: radial-gradient(circle, rgba(0, 240, 255, 0.4) 0%, rgba(2, 6, 23, 0.85) 100%) !important;
+      background: radial-gradient(circle, rgba(0, 240, 255, 0.45) 0%, rgba(2, 6, 23, 0.88) 100%) !important;
       border: 1.8px solid #00f0ff !important;
       border-radius: 50% !important;
       color: #ffffff !important;
@@ -118,7 +118,7 @@
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      box-shadow: 0 0 20px rgba(0, 240, 255, 0.65), inset 0 0 12px rgba(0, 240, 255, 0.35) !important;
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.7), inset 0 0 12px rgba(0, 240, 255, 0.35) !important;
       backdrop-filter: blur(8px) !important;
       animation: cluster-pulse 3.5s infinite alternate !important;
     }
@@ -229,7 +229,7 @@
       <div class="flex flex-wrap items-center gap-3">
         <!-- Base Layer Selector -->
         <select id="mapLayerSelect" onchange="changeMapLayer(this.value)" class="bg-slate-900 border border-cyan-500/40 rounded-lg px-2.5 py-1.5 text-xs text-cyan-300 font-mono focus:outline-none shadow">
-          <option value="cyberpunk_glow">🌌 Cyberpunk Neon Outlines (Default)</option>
+          <option value="cyberpunk_glow" selected>🌌 Cyberpunk Neon Outlines (Default)</option>
           <option value="esri_dark">🛰️ Tactical Dark Radar</option>
           <option value="esri_satellite">🌍 High-Res Satellite Recon</option>
           <option value="mapbox_dark">⚡ Mapbox Dark (Requires API Key)</option>
@@ -571,7 +571,7 @@
               opacity: 0.95,
               color: '#00f0ff',
               fillColor: '#030712',
-              fillOpacity: 0.68
+              fillOpacity: 0.65
             };
           },
           onEachFeature: function(feature, layer) {
