@@ -384,8 +384,8 @@
 
     const TILE_PRESETS = {
       cyberpunk_glow: {
-        url: 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_nolabels/{z}/{x}/{y}.png',
-        options: { subdomains: 'abcd', attribution: '&copy; CARTO &copy; OpenStreetMap', maxZoom: 18 }
+        url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+        options: { attribution: '&copy; Esri &copy; OpenStreetMap', maxZoom: 16 }
       },
       esri_dark: {
         url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
