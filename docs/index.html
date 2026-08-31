@@ -15,65 +15,65 @@
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   
   <style>
-    body { background-color: #01040a; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; }
-    .glass-card { background: rgba(3, 7, 18, 0.88); backdrop-filter: blur(16px); border: 1px solid rgba(0, 210, 235, 0.2); }
+    body { background-color: #030712; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; }
+    .glass-card { background: rgba(8, 14, 28, 0.88); backdrop-filter: blur(16px); border: 1px solid rgba(0, 210, 235, 0.22); }
     .glow-text { text-shadow: 0 0 12px rgba(0, 210, 235, 0.6); }
     .sensor-mesh-glow { text-shadow: 0 0 10px rgba(16, 185, 129, 0.6); }
     
-    /* True Pitch-Black Obsidian Canvas with Subtle Tactical Grid */
+    /* Tactical Navy-Black Canvas with Balanced Contrast */
     #map {
       height: 560px;
       border-radius: 14px;
       position: relative;
       overflow: hidden;
-      background-color: #010308 !important;
+      background-color: #070d1a !important;
       background-image: 
-        linear-gradient(rgba(0, 210, 235, 0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 210, 235, 0.04) 1px, transparent 1px) !important;
+        linear-gradient(rgba(0, 210, 235, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 210, 235, 0.05) 1px, transparent 1px) !important;
       background-size: 32px 32px !important;
-      border: 1px solid rgba(0, 210, 235, 0.3);
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.8), inset 0 0 60px rgba(0, 0, 0, 0.98);
+      border: 1px solid rgba(0, 210, 235, 0.35);
+      box-shadow: 0 0 24px rgba(0, 0, 0, 0.7), inset 0 0 40px rgba(0, 0, 0, 0.8);
     }
 
-    /* Dark Base Tiles */
+    /* Balanced Dark Base Map Tiles */
     .dark-base-tiles {
-      filter: brightness(0.3) contrast(1.7) !important;
-      opacity: 0.35 !important;
+      filter: brightness(0.7) contrast(1.3) !important;
+      opacity: 0.68 !important;
     }
 
-    /* Deep Black Land Fill with Crisp, Subtle Laser Glow Outlines */
+    /* Translucent Land Fill with Clear Geography & Crisp Laser Outlines */
     path.glowing-state-border {
       stroke: #00d2eb !important;
-      stroke-width: 1.2px !important;
-      stroke-opacity: 0.85 !important;
-      fill: #020612 !important;
-      fill-opacity: 0.92 !important;
-      filter: drop-shadow(0 0 3px #00d2eb) drop-shadow(0 0 7px rgba(0, 210, 235, 0.35)) !important;
+      stroke-width: 1.3px !important;
+      stroke-opacity: 0.9 !important;
+      fill: #0c1524 !important;
+      fill-opacity: 0.45 !important;
+      filter: drop-shadow(0 0 3px #00d2eb) drop-shadow(0 0 6px rgba(0, 210, 235, 0.35)) !important;
       transition: all 0.2s ease !important;
     }
     path.glowing-state-border:hover {
       stroke: #00ff9d !important;
-      stroke-width: 2px !important;
-      fill: #041424 !important;
-      fill-opacity: 0.95 !important;
+      stroke-width: 2.2px !important;
+      fill: #10243d !important;
+      fill-opacity: 0.65 !important;
       filter: drop-shadow(0 0 6px #00ff9d) drop-shadow(0 0 12px rgba(0, 255, 157, 0.5)) !important;
     }
 
-    /* Subtle Mountain Hillshade Overlay */
+    /* Shaded Mountain Hillshade Overlay */
     .neon-hillshade-tiles {
-      filter: invert(1) hue-rotate(180deg) brightness(0.65) contrast(2.5) !important;
+      filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(2.2) !important;
       mix-blend-mode: screen !important;
-      opacity: 0.22 !important;
+      opacity: 0.38 !important;
     }
 
     /* Crisp Country Boundaries & Coastlines */
     .neon-boundary-tiles {
       filter: drop-shadow(0 0 3px #00d2eb) brightness(1.6) contrast(2) !important;
       mix-blend-mode: screen !important;
-      opacity: 0.75 !important;
+      opacity: 0.85 !important;
     }
 
-    /* Tactical Radar Sweep Overlay (Subtle) */
+    /* Tactical Radar Sweep Overlay */
     .radar-sweep-overlay {
       position: absolute;
       top: 50%;
@@ -83,7 +83,7 @@
       transform: translate(-50%, -50%);
       pointer-events: none;
       z-index: 400;
-      background: conic-gradient(from 0deg, rgba(0, 210, 235, 0.12) 0deg, rgba(0, 210, 235, 0.02) 40deg, transparent 80deg, transparent 360deg);
+      background: conic-gradient(from 0deg, rgba(0, 210, 235, 0.14) 0deg, rgba(0, 210, 235, 0.02) 40deg, transparent 80deg, transparent 360deg);
       border-radius: 50%;
       animation: radar-sweep 9s linear infinite;
       mix-blend-mode: screen;
@@ -114,8 +114,8 @@
 
     /* Translucent Cluster Bubbles with Subdued Neon Outline */
     .cyber-cluster {
-      background: radial-gradient(circle, rgba(0, 210, 235, 0.35) 0%, rgba(2, 6, 23, 0.92) 100%) !important;
-      border: 1.4px solid #00d2eb !important;
+      background: radial-gradient(circle, rgba(0, 210, 235, 0.4) 0%, rgba(3, 10, 26, 0.9) 100%) !important;
+      border: 1.5px solid #00d2eb !important;
       border-radius: 50% !important;
       color: #ffffff !important;
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace !important;
@@ -137,7 +137,7 @@
 
     /* Tactical HUD Hover Tooltip */
     .leaflet-tooltip.tactical-tooltip {
-      background: rgba(2, 6, 18, 0.96);
+      background: rgba(3, 8, 22, 0.96);
       border: 1px solid #00d2eb;
       border-radius: 8px;
       color: #f1f5f9;
@@ -228,7 +228,7 @@
     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-4">
       <div>
         <h2 class="text-lg font-bold text-white flex items-center gap-2">
-          <span>🗺️</span> Stealth Obsidian Radar &amp; Sensor Mesh Telemetry
+          <span>🗺️</span> Tactical Geospatial Radar &amp; Sensor Mesh Telemetry
         </h2>
         <p class="text-xs text-cyan-300/70">💡 <strong>Hover over any spot or cluster (&lt;10 nodes)</strong> to inspect sightings, dates, shapes, and telemetry.</p>
       </div>
@@ -237,7 +237,7 @@
       <div class="flex flex-wrap items-center gap-3">
         <!-- Base Layer Selector -->
         <select id="mapLayerSelect" onchange="changeMapLayer(this.value)" class="bg-slate-900 border border-cyan-500/30 rounded-lg px-2.5 py-1.5 text-xs text-cyan-300 font-mono focus:outline-none shadow">
-          <option value="cyberpunk_glow" selected>🌌 Stealth Obsidian Canvas (Default)</option>
+          <option value="cyberpunk_glow" selected>🌌 Tactical Dark Canvas (Default)</option>
           <option value="esri_dark">🛰️ Tactical Dark Radar</option>
           <option value="esri_satellite">🌍 High-Res Satellite Recon</option>
           <option value="mapbox_dark">⚡ Mapbox Dark (Requires API Key)</option>
@@ -551,11 +551,11 @@
         console.warn("Falling back to baseline sample dataset", e);
       }
 
-      // Initialize Leaflet Map with Pitch-Dark Translucent Base
+      // Initialize Leaflet Map with Balanced Contrast Navy-Black Base
       map = L.map('map', { zoomControl: true }).setView([39.0, -97.0], 4);
       changeMapLayer("cyberpunk_glow");
 
-      // 1. Shaded Mountain Relief / Topographic Hillshade Overlay with Subtle Screen Blend
+      // 1. Shaded Mountain Relief / Topographic Hillshade Overlay with Balanced Visibility
       hillshadeOverlay = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}', {
         className: 'neon-hillshade-tiles',
         maxZoom: 16
@@ -567,7 +567,7 @@
         maxZoom: 18
       }).addTo(map);
 
-      // 3. Glowing Vector US State Lines Layer (GeoJSON) with Deep Pitch-Black Fill
+      // 3. Glowing Vector US State Lines Layer (GeoJSON) with Translucent Navy Slate Fill
       try {
         const geoRes = await fetch("us-states.json");
         const geoData = await geoRes.json();
@@ -575,11 +575,11 @@
           style: function(feature) {
             return {
               className: 'glowing-state-border',
-              weight: 1.2,
-              opacity: 0.85,
+              weight: 1.3,
+              opacity: 0.9,
               color: '#00d2eb',
-              fillColor: '#020612',
-              fillOpacity: 0.92
+              fillColor: '#0c1524',
+              fillOpacity: 0.45
             };
           },
           onEachFeature: function(feature, layer) {
