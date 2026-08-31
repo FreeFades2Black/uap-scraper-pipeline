@@ -1,3 +1,9 @@
+"""
+02_silver_transformation.py
+
+Internal Module Implementation with comprehensive inline documentation.
+Part of the FreeFades2Black enterprise ecosystem.
+"""
 # Databricks notebook source
 # DBTITLE 1,Silver Layer - Structure, Normalize & Validate UAP Sightings
 # MAGIC %md

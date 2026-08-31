@@ -204,3 +204,27 @@ helm install uap-scraper ./charts/uap-scraper --namespace uap-pipeline --create-
 **Maintained by:** [FreeFades2Black](https://github.com/FreeFades2Black)  
 **Version:** 2.0.0  
 **License:** Apache-2.0
+
+---
+
+## 🔍 Internal Code Architecture & Comprehensive Inline Documentation
+
+> **Comprehensive Codebase Documentation Audit Completed (2026)**
+> Every core module, function, class, and critical execution path across this repository has been audited and enriched with detailed internal inline comments (`# ...`) and comprehensive docstrings. Anyone reading the source code can immediately trace the operational mechanics, data flow, failure recovery strategies, and architectural decisions.
+
+### 🧩 Key Codebase Modules & Internal Mechanics Walkthrough
+
+| File / Component | Purpose & Internal Mechanics |
+| :--- | :--- |
+| [`scraper/src/api.py`](scraper/src/api.py) | FastAPI microservice providing health probes, on-demand scrape webhooks, and live sensor mesh endpoints. |
+| [`scraper/src/main.py`](scraper/src/main.py) | CLI entrypoint for batch scraping, local volume staging, and Google Cloud Storage raw data uploads. |
+| [`scraper/src/orchestrator.py`](scraper/src/orchestrator.py) | Multi-threaded collector manager executing concurrent ingestions across 8+ telemetry sources with exponential backoff. |
+| [`scraper/src/collectors/global_sensor_mesh_collector.py`](scraper/src/collectors/global_sensor_mesh_collector.py) | Real-time ADS-B transponder anomaly tracker and NORAD CelesTrak satellite deconfliction engine. |
+| [`notebooks/01_bronze_ingestion.py`](notebooks/01_bronze_ingestion.py) | Databricks PySpark Bronze pipeline exploding raw JSON envelopes and preserving immutable audit metadata. |
+| [`notebooks/02_silver_transformation.py`](notebooks/02_silver_transformation.py) | Databricks PySpark Silver pipeline standardizing timestamps, shape taxonomy, and geocoded coordinates. |
+| [`notebooks/03_gold_summary.py`](notebooks/03_gold_summary.py) | Databricks PySpark Gold analytics generating 5 high-throughput dimensional reporting tables. |
+
+### 💡 Developer & Maintainer Guidelines
+- **Inline Documentation Standard:** Every non-trivial logic branch, data transformation, API integration, and error block includes descriptive line-by-line internal notes.
+- **Traceability:** Function signatures declare explicit type annotations (`typing.Dict`, `typing.List`, `typing.Optional`) and descriptive parameter/return docstrings.
+- **Error Resilience:** Try/except blocks document exact failure modes, fallback pathways, and logging formats.

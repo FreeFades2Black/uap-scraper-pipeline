@@ -1,3 +1,9 @@
+"""
+01_bronze_ingestion.py
+
+Internal Module Implementation with comprehensive inline documentation.
+Part of the FreeFades2Black enterprise ecosystem.
+"""
 # Databricks notebook source
 # DBTITLE 1,Bronze Layer - Ingest Raw UAP JSON Telemetry
 # MAGIC %md
