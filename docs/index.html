@@ -15,59 +15,65 @@
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   
   <style>
-    body { background-color: #02040a; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; }
-    .glass-card { background: rgba(5, 10, 24, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(0, 240, 255, 0.25); }
-    .glow-text { text-shadow: 0 0 16px rgba(0, 240, 255, 0.8), 0 0 32px rgba(0, 240, 255, 0.4); }
-    .sensor-mesh-glow { text-shadow: 0 0 14px rgba(16, 185, 129, 0.8); }
+    body { background-color: #01040a; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; }
+    .glass-card { background: rgba(3, 7, 18, 0.88); backdrop-filter: blur(16px); border: 1px solid rgba(0, 210, 235, 0.2); }
+    .glow-text { text-shadow: 0 0 12px rgba(0, 210, 235, 0.6); }
+    .sensor-mesh-glow { text-shadow: 0 0 10px rgba(16, 185, 129, 0.6); }
     
-    /* Pitch Black Translucent Map Canvas with Cyberpunk Grid */
+    /* True Pitch-Black Obsidian Canvas with Subtle Tactical Grid */
     #map {
       height: 560px;
       border-radius: 14px;
       position: relative;
       overflow: hidden;
-      background-color: #02040a !important;
+      background-color: #010308 !important;
       background-image: 
-        linear-gradient(rgba(0, 240, 255, 0.06) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 240, 255, 0.06) 1px, transparent 1px) !important;
+        linear-gradient(rgba(0, 210, 235, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 210, 235, 0.04) 1px, transparent 1px) !important;
       background-size: 32px 32px !important;
-      border: 1.5px solid rgba(0, 240, 255, 0.35);
-      box-shadow: 0 0 30px rgba(0, 240, 255, 0.2), inset 0 0 50px rgba(0, 0, 0, 0.95);
+      border: 1px solid rgba(0, 210, 235, 0.3);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.8), inset 0 0 60px rgba(0, 0, 0, 0.98);
     }
 
-    /* Glowing State & Geography Vector Lines */
+    /* Dark Base Tiles */
+    .dark-base-tiles {
+      filter: brightness(0.3) contrast(1.7) !important;
+      opacity: 0.35 !important;
+    }
+
+    /* Deep Black Land Fill with Crisp, Subtle Laser Glow Outlines */
     path.glowing-state-border {
-      stroke: #00f0ff !important;
-      stroke-width: 1.8px !important;
-      stroke-opacity: 0.95 !important;
-      fill: #030712 !important;
-      fill-opacity: 0.65 !important;
-      filter: drop-shadow(0 0 6px #00f0ff) drop-shadow(0 0 14px rgba(0, 240, 255, 0.65)) !important;
-      transition: all 0.25s ease !important;
+      stroke: #00d2eb !important;
+      stroke-width: 1.2px !important;
+      stroke-opacity: 0.85 !important;
+      fill: #020612 !important;
+      fill-opacity: 0.92 !important;
+      filter: drop-shadow(0 0 3px #00d2eb) drop-shadow(0 0 7px rgba(0, 210, 235, 0.35)) !important;
+      transition: all 0.2s ease !important;
     }
     path.glowing-state-border:hover {
       stroke: #00ff9d !important;
-      stroke-width: 2.6px !important;
-      fill: #06192e !important;
-      fill-opacity: 0.82 !important;
-      filter: drop-shadow(0 0 10px #00ff9d) drop-shadow(0 0 22px rgba(0, 255, 157, 0.85)) !important;
+      stroke-width: 2px !important;
+      fill: #041424 !important;
+      fill-opacity: 0.95 !important;
+      filter: drop-shadow(0 0 6px #00ff9d) drop-shadow(0 0 12px rgba(0, 255, 157, 0.5)) !important;
     }
 
-    /* Cyberpunk Mountain Hillshade Elevation Overlay */
+    /* Subtle Mountain Hillshade Overlay */
     .neon-hillshade-tiles {
-      filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(2.8) drop-shadow(0 0 4px #00f0ff) !important;
+      filter: invert(1) hue-rotate(180deg) brightness(0.65) contrast(2.5) !important;
       mix-blend-mode: screen !important;
-      opacity: 0.42 !important;
+      opacity: 0.22 !important;
     }
 
-    /* Neon Country Boundaries & Coastlines */
+    /* Crisp Country Boundaries & Coastlines */
     .neon-boundary-tiles {
-      filter: drop-shadow(0 0 5px #00f0ff) drop-shadow(0 0 12px rgba(0, 240, 255, 0.8)) brightness(2) contrast(2.5) !important;
+      filter: drop-shadow(0 0 3px #00d2eb) brightness(1.6) contrast(2) !important;
       mix-blend-mode: screen !important;
-      opacity: 0.9 !important;
+      opacity: 0.75 !important;
     }
 
-    /* Tactical Radar Sweep Overlay */
+    /* Tactical Radar Sweep Overlay (Subtle) */
     .radar-sweep-overlay {
       position: absolute;
       top: 50%;
@@ -77,9 +83,9 @@
       transform: translate(-50%, -50%);
       pointer-events: none;
       z-index: 400;
-      background: conic-gradient(from 0deg, rgba(0, 240, 255, 0.22) 0deg, rgba(0, 240, 255, 0.04) 45deg, transparent 90deg, transparent 360deg);
+      background: conic-gradient(from 0deg, rgba(0, 210, 235, 0.12) 0deg, rgba(0, 210, 235, 0.02) 40deg, transparent 80deg, transparent 360deg);
       border-radius: 50%;
-      animation: radar-sweep 8s linear infinite;
+      animation: radar-sweep 9s linear infinite;
       mix-blend-mode: screen;
     }
     @keyframes radar-sweep {
@@ -87,68 +93,70 @@
       to { transform: translate(-50%, -50%) rotate(360deg); }
     }
 
-    /* Cyberpunk Glowing Marker Animations */
+    /* Sleek Glowing Marker Animations */
     @keyframes beacon-pulse {
-      0% { transform: scale(0.92); opacity: 0.85; filter: drop-shadow(0 0 6px currentColor); }
-      50% { transform: scale(1.18); opacity: 1; filter: drop-shadow(0 0 18px currentColor); }
-      100% { transform: scale(0.92); opacity: 0.85; filter: drop-shadow(0 0 6px currentColor); }
+      0% { transform: scale(0.94); opacity: 0.85; filter: drop-shadow(0 0 3px currentColor); }
+      50% { transform: scale(1.12); opacity: 1; filter: drop-shadow(0 0 8px currentColor); }
+      100% { transform: scale(0.94); opacity: 0.85; filter: drop-shadow(0 0 3px currentColor); }
     }
     .neon-marker {
       display: flex;
       align-items: center;
       justify-content: center;
-      animation: beacon-pulse 2.8s ease-in-out infinite;
+      animation: beacon-pulse 3s ease-in-out infinite;
       cursor: pointer;
       transition: transform 0.2s ease;
     }
     .neon-marker:hover {
-      transform: scale(1.4) !important;
+      transform: scale(1.3) !important;
       z-index: 1000 !important;
     }
 
-    /* Glassmorphic Cyberpunk Cluster Bubbles */
+    /* Translucent Cluster Bubbles with Subdued Neon Outline */
     .cyber-cluster {
-      background: radial-gradient(circle, rgba(0, 240, 255, 0.45) 0%, rgba(2, 6, 23, 0.88) 100%) !important;
-      border: 1.8px solid #00f0ff !important;
+      background: radial-gradient(circle, rgba(0, 210, 235, 0.35) 0%, rgba(2, 6, 23, 0.92) 100%) !important;
+      border: 1.4px solid #00d2eb !important;
       border-radius: 50% !important;
       color: #ffffff !important;
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace !important;
-      font-weight: 900 !important;
+      font-weight: 800 !important;
       font-size: 11px !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
-      box-shadow: 0 0 20px rgba(0, 240, 255, 0.7), inset 0 0 12px rgba(0, 240, 255, 0.35) !important;
+      box-shadow: 0 0 10px rgba(0, 210, 235, 0.45), inset 0 0 6px rgba(0, 210, 235, 0.2) !important;
       backdrop-filter: blur(8px) !important;
-      animation: cluster-pulse 3.5s infinite alternate !important;
+      transition: all 0.2s ease !important;
+      cursor: pointer !important;
     }
-    @keyframes cluster-pulse {
-      0% { box-shadow: 0 0 12px rgba(0, 240, 255, 0.5); }
-      100% { box-shadow: 0 0 28px rgba(0, 240, 255, 0.9), 0 0 40px rgba(217, 70, 239, 0.5); }
+    .cyber-cluster:hover {
+      border-color: #00ff9d !important;
+      box-shadow: 0 0 16px rgba(0, 255, 157, 0.7), inset 0 0 10px rgba(0, 255, 157, 0.3) !important;
+      transform: scale(1.15) !important;
     }
 
-    /* Cyberpunk HUD Hover Tooltip */
+    /* Tactical HUD Hover Tooltip */
     .leaflet-tooltip.tactical-tooltip {
-      background: rgba(2, 6, 23, 0.95);
-      border: 1.5px solid #00f0ff;
-      border-radius: 10px;
+      background: rgba(2, 6, 18, 0.96);
+      border: 1px solid #00d2eb;
+      border-radius: 8px;
       color: #f1f5f9;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       font-size: 11px;
-      padding: 12px 14px;
-      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.9), 0 0 22px rgba(0, 240, 255, 0.5);
-      max-width: 300px;
+      padding: 10px 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), 0 0 14px rgba(0, 210, 235, 0.3);
+      max-width: 320px;
       white-space: normal;
       backdrop-filter: blur(14px);
     }
-    .leaflet-tooltip-top.tactical-tooltip:before { border-top-color: #00f0ff; }
-    .leaflet-tooltip-bottom.tactical-tooltip:before { border-bottom-color: #00f0ff; }
+    .leaflet-tooltip-top.tactical-tooltip:before { border-top-color: #00d2eb; }
+    .leaflet-tooltip-bottom.tactical-tooltip:before { border-bottom-color: #00d2eb; }
   </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
 
   <!-- Header -->
-  <header class="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-cyan-900/40 pb-6">
+  <header class="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-cyan-900/30 pb-6">
     <div>
       <div class="flex items-center gap-3">
         <span class="text-3xl">🛸</span>
@@ -160,10 +168,10 @@
       <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Sensor Mesh Active
       </span>
-      <button onclick="toggleApiKeyModal()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-cyan-500/40 transition flex items-center gap-1.5 shadow-lg shadow-cyan-950/50">
+      <button onclick="toggleApiKeyModal()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-cyan-500/30 transition flex items-center gap-1.5 shadow">
         <span>🗺️</span> Map API Keys
       </button>
-      <a href="https://github.com/FreeFades2Black/uap-scraper-pipeline" target="_blank" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-cyan-600 hover:bg-cyan-500 text-white transition shadow-lg shadow-cyan-900/40">
+      <a href="https://github.com/FreeFades2Black/uap-scraper-pipeline" target="_blank" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-cyan-700 hover:bg-cyan-600 text-white transition shadow">
         GitHub Repo ↗
       </a>
     </div>
@@ -171,24 +179,24 @@
 
   <!-- KPI Scorecards -->
   <section class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-    <div class="glass-card p-5 rounded-xl border-cyan-500/30">
+    <div class="glass-card p-5 rounded-xl border-cyan-500/20">
       <div class="text-xs uppercase tracking-wider text-cyan-400 font-semibold mb-1">Total Ingested Sightings</div>
       <div class="text-3xl font-black text-white" id="kpi-total">1,020</div>
       <div class="text-xs text-emerald-400 mt-1 flex items-center gap-1">
         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> 100% Zero-Stall Ingestion
       </div>
     </div>
-    <div class="glass-card p-5 rounded-xl border-cyan-500/30">
+    <div class="glass-card p-5 rounded-xl border-cyan-500/20">
       <div class="text-xs uppercase tracking-wider text-teal-400 font-semibold mb-1">Geocoded Coverage</div>
       <div class="text-3xl font-black text-white" id="kpi-geocoded">99.6%</div>
       <div class="text-xs text-slate-400 mt-1">805+ Unique Airspace Nodes</div>
     </div>
-    <div class="glass-card p-5 rounded-xl border-fuchsia-500/30">
+    <div class="glass-card p-5 rounded-xl border-fuchsia-500/20">
       <div class="text-xs uppercase tracking-wider text-fuchsia-400 font-semibold mb-1">Active Intelligence Feeds</div>
       <div class="text-3xl font-black text-white" id="kpi-sources">4</div>
       <div class="text-xs text-slate-400 mt-1">Kaggle / AARO / NASA / Sensor Mesh</div>
     </div>
-    <div class="glass-card p-5 rounded-xl border-indigo-500/30">
+    <div class="glass-card p-5 rounded-xl border-indigo-500/20">
       <div class="text-xs uppercase tracking-wider text-indigo-400 font-semibold mb-1">Orbital Deconfliction</div>
       <div class="text-3xl font-black text-white">NORAD / LEO</div>
       <div class="text-xs text-slate-400 mt-1">CelesTrak Space Surveillance</div>
@@ -196,7 +204,7 @@
   </section>
 
   <!-- Sensor Mesh Banner -->
-  <section class="max-w-7xl mx-auto glass-card p-4 rounded-xl mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-l-4 border-emerald-400">
+  <section class="max-w-7xl mx-auto glass-card p-4 rounded-xl mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-l-4 border-emerald-500">
     <div>
       <div class="flex items-center gap-2">
         <span class="text-lg">🛰️</span>
@@ -206,30 +214,30 @@
       <p class="text-xs text-slate-400 mt-0.5">Real-time secondary surveillance transponder triggers, optical satellite deconfliction tracks, and multi-spectrum aerospace intelligence.</p>
     </div>
     <div class="flex items-center gap-2">
-      <button onclick="fetchAirspaceMesh()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300 border border-emerald-500/40 transition flex items-center gap-1">
+      <button onclick="fetchAirspaceMesh()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300 border border-emerald-500/30 transition flex items-center gap-1">
         <span>📡</span> OpenSky ADS-B Ingestion
       </button>
-      <button onclick="fetchOrbitMesh()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/40 transition flex items-center gap-1">
+      <button onclick="fetchOrbitMesh()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/30 transition flex items-center gap-1">
         <span>🛰️</span> CelesTrak Orbital Ephemeris
       </button>
     </div>
   </section>
 
   <!-- Geospatial Map Section -->
-  <section class="max-w-7xl mx-auto glass-card p-6 rounded-2xl mb-8 border-cyan-500/40 shadow-2xl">
+  <section class="max-w-7xl mx-auto glass-card p-6 rounded-2xl mb-8 border-cyan-500/30 shadow-2xl">
     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-4">
       <div>
         <h2 class="text-lg font-bold text-white flex items-center gap-2">
-          <span>🗺️</span> Cyberpunk Translucent Radar &amp; Glowing Geographic Mesh
+          <span>🗺️</span> Stealth Obsidian Radar &amp; Sensor Mesh Telemetry
         </h2>
-        <p class="text-xs text-cyan-300/70">💡 Translucent pitch-black terrain with <strong>neon glowing state lines, mountain relief, and UAP beacons</strong>.</p>
+        <p class="text-xs text-cyan-300/70">💡 <strong>Hover over any spot or cluster (&lt;10 nodes)</strong> to inspect sightings, dates, shapes, and telemetry.</p>
       </div>
 
       <!-- Layer & Overlay Controls -->
       <div class="flex flex-wrap items-center gap-3">
         <!-- Base Layer Selector -->
-        <select id="mapLayerSelect" onchange="changeMapLayer(this.value)" class="bg-slate-900 border border-cyan-500/40 rounded-lg px-2.5 py-1.5 text-xs text-cyan-300 font-mono focus:outline-none shadow">
-          <option value="cyberpunk_glow" selected>🌌 Cyberpunk Neon Outlines (Default)</option>
+        <select id="mapLayerSelect" onchange="changeMapLayer(this.value)" class="bg-slate-900 border border-cyan-500/30 rounded-lg px-2.5 py-1.5 text-xs text-cyan-300 font-mono focus:outline-none shadow">
+          <option value="cyberpunk_glow" selected>🌌 Stealth Obsidian Canvas (Default)</option>
           <option value="esri_dark">🛰️ Tactical Dark Radar</option>
           <option value="esri_satellite">🌍 High-Res Satellite Recon</option>
           <option value="mapbox_dark">⚡ Mapbox Dark (Requires API Key)</option>
@@ -237,12 +245,12 @@
         </select>
 
         <!-- Toggle Layers -->
-        <div class="flex items-center gap-3 bg-slate-900/90 px-3 py-1.5 rounded-lg border border-cyan-900/40 text-xs">
+        <div class="flex items-center gap-3 bg-slate-900/90 px-3 py-1.5 rounded-lg border border-cyan-900/30 text-xs">
           <label class="flex items-center gap-1.5 text-cyan-300 cursor-pointer">
-            <input type="checkbox" id="toggleStates" checked onchange="toggleOverlay('states', this.checked)" class="rounded border-slate-700 text-cyan-500"> Glowing State Lines
+            <input type="checkbox" id="toggleStates" checked onchange="toggleOverlay('states', this.checked)" class="rounded border-slate-700 text-cyan-500"> State Lines
           </label>
           <label class="flex items-center gap-1.5 text-teal-300 cursor-pointer">
-            <input type="checkbox" id="toggleHillshade" checked onchange="toggleOverlay('hillshade', this.checked)" class="rounded border-slate-700 text-teal-500"> Mountain Relief
+            <input type="checkbox" id="toggleHillshade" checked onchange="toggleOverlay('hillshade', this.checked)" class="rounded border-slate-700 text-teal-500"> Mountains
           </label>
           <label class="flex items-center gap-1.5 text-blue-300 cursor-pointer">
             <input type="checkbox" id="toggleRadarSweep" checked onchange="toggleRadarSweep(this.checked)" class="rounded border-slate-700 text-blue-500"> Radar Sweep
@@ -259,11 +267,11 @@
     <!-- Map Legend -->
     <div class="mt-4 flex flex-wrap items-center justify-between gap-3 text-[11px] text-slate-400 border-t border-slate-800/80 pt-3 font-mono">
       <div class="flex flex-wrap items-center gap-4">
-        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-cyan-400/80 border border-cyan-300 shadow-[0_0_8px_#00f0ff]"></span> Triangle / Chevron</span>
-        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-400/80 border border-emerald-300 shadow-[0_0_8px_#00ff9d]"></span> Sphere / Orb</span>
-        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-fuchsia-400/80 border border-fuchsia-300 shadow-[0_0_8px_#d946ef]"></span> Disk / Saucer</span>
-        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-400/80 border border-amber-300 shadow-[0_0_8px_#facc15]"></span> Light / Fireball</span>
-        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-500/90 border border-rose-300 shadow-[0_0_8px_#f43f5e]"></span> Military / DoD Sensor Lock</span>
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-cyan-400 border border-cyan-200 shadow-[0_0_5px_#00d2eb]"></span> Triangle</span>
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 border border-emerald-200 shadow-[0_0_5px_#00ff9d]"></span> Orb / Sphere</span>
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-fuchsia-400 border border-fuchsia-200 shadow-[0_0_5px_#d946ef]"></span> Disk / Saucer</span>
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 border border-amber-200 shadow-[0_0_5px_#facc15]"></span> Light</span>
+        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 border border-rose-200 shadow-[0_0_5px_#f43f5e]"></span> DoD / Military Sensor Lock</span>
       </div>
       <span class="text-cyan-400 font-bold">1,020+ Ingested &amp; Mapped Points</span>
     </div>
@@ -272,7 +280,7 @@
   <!-- Visual Analytics Grid -->
   <section class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
     <!-- Chart 1: Shape Distribution -->
-    <div class="glass-card p-5 rounded-xl border-cyan-500/30">
+    <div class="glass-card p-5 rounded-xl border-cyan-500/20">
       <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
         <span>🛸</span> Phenomenon Shape Taxonomy
       </h3>
@@ -282,7 +290,7 @@
     </div>
 
     <!-- Chart 2: Top States -->
-    <div class="glass-card p-5 rounded-xl border-cyan-500/30">
+    <div class="glass-card p-5 rounded-xl border-cyan-500/20">
       <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
         <span>📍</span> Top Sightings by Region &amp; Airspace
       </h3>
@@ -292,7 +300,7 @@
     </div>
 
     <!-- Chart 3: Source Reliability -->
-    <div class="glass-card p-5 rounded-xl md:col-span-2 lg:col-span-1 border-cyan-500/30">
+    <div class="glass-card p-5 rounded-xl md:col-span-2 lg:col-span-1 border-cyan-500/20">
       <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
         <span>📡</span> Collector Reliability &amp; Quality Score
       </h3>
@@ -303,7 +311,7 @@
   </section>
 
   <!-- Sighting Records Explorer Table -->
-  <section class="max-w-7xl mx-auto glass-card p-6 rounded-2xl mb-12 border-cyan-500/30">
+  <section class="max-w-7xl mx-auto glass-card p-6 rounded-2xl mb-12 border-cyan-500/20">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
       <div>
         <h2 class="text-lg font-bold text-white flex items-center gap-2">
@@ -385,7 +393,7 @@
     const TILE_PRESETS = {
       cyberpunk_glow: {
         url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-        options: { attribution: '&copy; Esri &copy; OpenStreetMap', maxZoom: 16 }
+        options: { className: 'dark-base-tiles', attribution: '&copy; Esri &copy; OpenStreetMap', maxZoom: 16 }
       },
       esri_dark: {
         url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
@@ -475,47 +483,47 @@
       }
     }
 
-    // Helper: Shape-Specific Glowing Cyberpunk SVG Icons
+    // Helper: Shape-Specific Glowing Cyberpunk SVG Icons (Subdued, Sleek Glow)
     function getCyberMarkerIcon(shape, source) {
       const s = (shape || '').toLowerCase();
-      let color = '#00f0ff';
-      let glowColor = 'rgba(0, 240, 255, 0.85)';
-      let svgGlyph = `<circle cx="12" cy="12" r="6" fill="rgba(0, 240, 255, 0.45)" stroke="#00f0ff" stroke-width="2"/>`;
+      let color = '#00d2eb';
+      let glowColor = 'rgba(0, 210, 235, 0.6)';
+      let svgGlyph = `<circle cx="12" cy="12" r="5" fill="rgba(0, 210, 235, 0.4)" stroke="#00d2eb" stroke-width="1.8"/>`;
 
       if (source === 'AARO_DoD' || source === 'NASA_UAP') {
         color = '#f43f5e';
-        glowColor = 'rgba(244, 63, 94, 0.9)';
+        glowColor = 'rgba(244, 63, 94, 0.7)';
         svgGlyph = `
-          <circle cx="12" cy="12" r="8" fill="none" stroke="#f43f5e" stroke-width="1.5" stroke-dasharray="3 2"/>
-          <circle cx="12" cy="12" r="4" fill="rgba(244, 63, 94, 0.65)" stroke="#f43f5e" stroke-width="1.5"/>
-          <line x1="12" y1="2" x2="12" y2="7" stroke="#f43f5e" stroke-width="1.5"/>
-          <line x1="12" y1="17" x2="12" y2="22" stroke="#f43f5e" stroke-width="1.5"/>
+          <circle cx="12" cy="12" r="7" fill="none" stroke="#f43f5e" stroke-width="1.3" stroke-dasharray="2 2"/>
+          <circle cx="12" cy="12" r="3.5" fill="rgba(244, 63, 94, 0.6)" stroke="#f43f5e" stroke-width="1.3"/>
+          <line x1="12" y1="2" x2="12" y2="6" stroke="#f43f5e" stroke-width="1.3"/>
+          <line x1="12" y1="18" x2="12" y2="22" stroke="#f43f5e" stroke-width="1.3"/>
         `;
       } else if (s.includes('triang') || s.includes('chevron')) {
-        color = '#00f0ff';
-        glowColor = 'rgba(0, 240, 255, 0.9)';
-        svgGlyph = `<polygon points="12,3 21,19 3,19" fill="rgba(0, 240, 255, 0.45)" stroke="#00f0ff" stroke-width="2"/>`;
+        color = '#00d2eb';
+        glowColor = 'rgba(0, 210, 235, 0.6)';
+        svgGlyph = `<polygon points="12,4 20,18 4,18" fill="rgba(0, 210, 235, 0.4)" stroke="#00d2eb" stroke-width="1.8"/>`;
       } else if (s.includes('sphere') || s.includes('orb')) {
         color = '#00ff9d';
-        glowColor = 'rgba(0, 255, 157, 0.9)';
-        svgGlyph = `<circle cx="12" cy="12" r="6.5" fill="rgba(0, 255, 157, 0.45)" stroke="#00ff9d" stroke-width="2"/>`;
+        glowColor = 'rgba(0, 255, 157, 0.6)';
+        svgGlyph = `<circle cx="12" cy="12" r="5.5" fill="rgba(0, 255, 157, 0.4)" stroke="#00ff9d" stroke-width="1.8"/>`;
       } else if (s.includes('disk') || s.includes('saucer') || s.includes('oval')) {
         color = '#d946ef';
-        glowColor = 'rgba(217, 70, 239, 0.9)';
-        svgGlyph = `<ellipse cx="12" cy="12" rx="9" ry="5" fill="rgba(217, 70, 239, 0.45)" stroke="#d946ef" stroke-width="2"/>`;
+        glowColor = 'rgba(217, 70, 239, 0.6)';
+        svgGlyph = `<ellipse cx="12" cy="12" rx="8" ry="4.5" fill="rgba(217, 70, 239, 0.4)" stroke="#d946ef" stroke-width="1.8"/>`;
       } else if (s.includes('light') || s.includes('fireball')) {
         color = '#facc15';
-        glowColor = 'rgba(250, 204, 21, 0.9)';
-        svgGlyph = `<circle cx="12" cy="12" r="5" fill="rgba(250, 204, 21, 0.65)" stroke="#facc15" stroke-width="2.5"/>`;
+        glowColor = 'rgba(250, 204, 21, 0.6)';
+        svgGlyph = `<circle cx="12" cy="12" r="4.5" fill="rgba(250, 204, 21, 0.6)" stroke="#facc15" stroke-width="2"/>`;
       } else if (s.includes('cigar') || s.includes('cylind')) {
         color = '#38bdf8';
-        svgGlyph = `<rect x="5" y="8" width="14" height="8" rx="4" fill="rgba(56, 189, 248, 0.45)" stroke="#38bdf8" stroke-width="2"/>`;
+        svgGlyph = `<rect x="5" y="8" width="14" height="8" rx="4" fill="rgba(56, 189, 248, 0.4)" stroke="#38bdf8" stroke-width="1.8"/>`;
       }
 
       return L.divIcon({
         className: 'neon-marker',
         html: `
-          <div style="width: 24px; height: 24px; filter: drop-shadow(0 0 8px ${glowColor});">
+          <div style="width: 24px; height: 24px; filter: drop-shadow(0 0 4px ${glowColor});">
             <svg width="24" height="24" viewBox="0 0 24 24">${svgGlyph}</svg>
           </div>
         `,
@@ -547,7 +555,7 @@
       map = L.map('map', { zoomControl: true }).setView([39.0, -97.0], 4);
       changeMapLayer("cyberpunk_glow");
 
-      // 1. Shaded Mountain Relief / Topographic Hillshade Overlay with Neon Screen Blend
+      // 1. Shaded Mountain Relief / Topographic Hillshade Overlay with Subtle Screen Blend
       hillshadeOverlay = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}', {
         className: 'neon-hillshade-tiles',
         maxZoom: 16
@@ -559,7 +567,7 @@
         maxZoom: 18
       }).addTo(map);
 
-      // 3. Glowing Vector US State Lines Layer (GeoJSON)
+      // 3. Glowing Vector US State Lines Layer (GeoJSON) with Deep Pitch-Black Fill
       try {
         const geoRes = await fetch("us-states.json");
         const geoData = await geoRes.json();
@@ -567,11 +575,11 @@
           style: function(feature) {
             return {
               className: 'glowing-state-border',
-              weight: 1.8,
-              opacity: 0.95,
-              color: '#00f0ff',
-              fillColor: '#030712',
-              fillOpacity: 0.65
+              weight: 1.2,
+              opacity: 0.85,
+              color: '#00d2eb',
+              fillColor: '#020612',
+              fillOpacity: 0.92
             };
           },
           onEachFeature: function(feature, layer) {
@@ -581,7 +589,7 @@
 
             layer.bindTooltip(`
               <div style="font-family: ui-monospace, monospace; font-size: 11px;">
-                <strong style="color: #00f0ff;">📍 ${name}</strong><br/>
+                <strong style="color: #00d2eb;">📍 ${name}</strong><br/>
                 <span style="color: #00ff9d; font-weight: bold;">🛸 ${count} Recorded Sightings</span>
               </div>
             `, {
@@ -601,12 +609,60 @@
         showCoverageOnHover: false,
         iconCreateFunction: function(cluster) {
           const count = cluster.getChildCount();
-          let size = count < 20 ? 34 : count < 80 ? 42 : 50;
+          let size = count < 10 ? 30 : count < 50 ? 38 : 46;
           return L.divIcon({
             html: `<div class="cyber-cluster" style="width: ${size}px; height: ${size}px;">${count}</div>`,
             className: '',
             iconSize: L.point(size, size)
           });
+        }
+      });
+
+      // Hover Tooltip on Clusters (Shows Data for <10 and all clusters)
+      let clusterTooltip = null;
+      markersGroup.on('clustermouseover', function(c) {
+        const cluster = c.layer;
+        const childMarkers = cluster.getAllChildMarkers();
+        const count = childMarkers.length;
+
+        let content = `<div style="font-family: ui-monospace, monospace; font-size: 11px; max-width: 290px; line-height: 1.35;">`;
+        content += `<div style="font-weight: 800; color: #00d2eb; border-bottom: 1px solid rgba(0, 210, 235, 0.3); padding-bottom: 3px; margin-bottom: 5px; display: flex; justify-content: space-between;">
+          <span>📍 AIRSPACE CLUSTER</span>
+          <span style="color: #00ff9d;">${count} SIGHTINGS</span>
+        </div>`;
+
+        // Show individual sighting breakdown
+        const sample = childMarkers.slice(0, 4);
+        sample.forEach((m) => {
+          const s = m.sightingData;
+          if (s) {
+            content += `<div style="margin-bottom: 4px; padding-bottom: 3px; border-bottom: 1px dashed rgba(255,255,255,0.08);">
+              <span style="color: #00ff9d; font-weight: bold;">🛸 ${(s.shape || 'Unknown').toUpperCase()}</span> • <span style="color: #ffffff;">${s.city || 'Unknown'}, ${s.state || ''}</span><br/>
+              <span style="color: #94a3b8; font-size: 10px;">🕒 ${s.date_time || s.occurred_at || 'Unknown'} | <span style="color: #38bdf8;">${s.data_source || ''}</span></span>
+            </div>`;
+          }
+        });
+
+        if (count > 4) {
+          content += `<div style="color: #64748b; font-size: 10px; text-align: center; margin-top: 3px;">+ ${count - 4} more sightings (click cluster to expand)</div>`;
+        }
+        content += `</div>`;
+
+        clusterTooltip = L.tooltip({
+          sticky: true,
+          className: 'tactical-tooltip',
+          direction: 'top',
+          offset: [0, -12]
+        })
+        .setLatLng(c.latlng)
+        .setContent(content)
+        .openOn(map);
+      });
+
+      markersGroup.on('clustermouseout', function() {
+        if (clusterTooltip) {
+          map.closeTooltip(clusterTooltip);
+          clusterTooltip = null;
         }
       });
 
@@ -617,17 +673,18 @@
           const marker = L.marker([lat, lon], {
             icon: getCyberMarkerIcon(s.shape, s.data_source)
           });
+          marker.sightingData = s; // Attach data for cluster hover inspection
 
-          // Rich Glowing Cyberpunk Hover Tooltip
+          // Rich Glowing Cyberpunk Hover Tooltip on Individual Spot
           const tooltipContent = `
             <div style="line-height: 1.4;">
-              <div style="font-weight: 900; color: #00f0ff; font-size: 12px; border-bottom: 1px solid rgba(0, 240, 255, 0.4); padding-bottom: 4px; margin-bottom: 6px; letter-spacing: 0.5px;">
+              <div style="font-weight: 800; color: #00d2eb; font-size: 12px; border-bottom: 1px solid rgba(0, 210, 235, 0.3); padding-bottom: 4px; margin-bottom: 6px; letter-spacing: 0.5px;">
                 🛸 ${(s.shape || 'UNCLASSIFIED').toUpperCase()}
               </div>
               <div style="margin-bottom: 2px;"><strong style="color: #94a3b8;">📍 Location:</strong> <span style="color: #ffffff; font-weight: 700;">${s.city || 'Unknown'}, ${s.state || ''}</span></div>
               <div style="margin-bottom: 2px;"><strong style="color: #94a3b8;">🕒 Sighting:</strong> <span style="color: #38bdf8;">${s.date_time || s.occurred_at || 'Unknown'}</span></div>
               <div style="margin-bottom: 2px;"><strong style="color: #94a3b8;">📡 Telemetry:</strong> <span style="color: #00ff9d; font-weight: 700;">${s.data_source || s.source || 'Unknown'}</span></div>
-              <div style="margin-top: 6px; color: #cbd5e1; font-size: 10px; font-style: italic; border-top: 1px dashed rgba(0, 240, 255, 0.25); padding-top: 5px;">
+              <div style="margin-top: 6px; color: #cbd5e1; font-size: 10px; font-style: italic; border-top: 1px dashed rgba(0, 210, 235, 0.2); padding-top: 5px;">
                 "${(s.summary || '').substring(0, 120)}..."
               </div>
             </div>
@@ -670,7 +727,7 @@
           labels: topShapes.map(x => x[0]),
           datasets: [{
             data: topShapes.map(x => x[1]),
-            backgroundColor: ['#00f0ff', '#00ff9d', '#d946ef', '#facc15', '#f43f5e', '#38bdf8', '#818cf8'],
+            backgroundColor: ['#00d2eb', '#00ff9d', '#d946ef', '#facc15', '#f43f5e', '#38bdf8', '#818cf8'],
             borderWidth: 0
           }]
         },
@@ -691,7 +748,7 @@
           datasets: [{
             label: 'Sightings',
             data: topStates.map(x => x[1]),
-            backgroundColor: '#00f0ff',
+            backgroundColor: '#00d2eb',
             borderRadius: 4
           }]
         },
@@ -715,7 +772,7 @@
           datasets: [{
             label: 'Data Quality %',
             data: [89.77, 66.67, 55.56, 95.00],
-            backgroundColor: ['#00ff9d', '#818cf8', '#f43f5e', '#00f0ff'],
+            backgroundColor: ['#00ff9d', '#818cf8', '#f43f5e', '#00d2eb'],
             borderRadius: 4
           }]
         },
@@ -749,7 +806,7 @@
           tr.innerHTML = `
             <td class="py-2.5 px-3 whitespace-nowrap text-cyan-300 font-mono">${s.date_time || s.occurred_at || 'Unknown'}</td>
             <td class="py-2.5 px-3 font-semibold">${s.city || 'Unknown'}, ${s.state || ''}</td>
-            <td class="py-2.5 px-3"><span class="bg-cyan-950/80 text-cyan-300 border border-cyan-800/60 px-2 py-0.5 rounded text-[10px] shadow-[0_0_6px_#00f0ff]">${s.shape || 'Unknown'}</span></td>
+            <td class="py-2.5 px-3"><span class="bg-cyan-950/80 text-cyan-300 border border-cyan-800/60 px-2 py-0.5 rounded text-[10px] shadow-[0_0_4px_#00d2eb]">${s.shape || 'Unknown'}</span></td>
             <td class="py-2.5 px-3 text-emerald-400 font-mono text-[10px]">${s.data_source || s.source || 'Unknown'}</td>
             <td class="py-2.5 px-3 text-slate-400 font-mono text-[10px]">${s.sensor_type || 'Optical / Witness'}</td>
             <td class="py-2.5 px-3 text-slate-300 max-w-xs truncate" title="${s.summary || ''}">${(s.summary || '').substring(0, 80)}...</td>
