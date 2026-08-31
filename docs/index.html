@@ -37,13 +37,15 @@
         <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> 🏛️ Ancient &amp; Modern Archives Active
       </span>
       <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> 📡 Sensor Mesh
-      </span>
+      <button onclick="setMapApiKey()" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-800/40 transition flex items-center gap-1.5">
+        <span>🔑</span> Map API Key
+      </button>
       <a href="https://github.com/FreeFades2Black/uap-scraper-pipeline" target="_blank" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white transition">
         GitHub Repo ↗
       </a>
     </div>
   </header>
+
 
   <!-- KPI Scorecards -->
   <section class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -250,14 +252,33 @@
         console.warn("Falling back to baseline sample dataset", e);
       }
 
-      // Initialize Leaflet Map
+      // Initialize Leaflet Map with Clean Dark Basemap (ESRI Dark Canvas - Zero Watermark)
       map = L.map('map').setView([38.5, -96.0], 4);
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap &copy; CARTO',
+      
+      const customKey = localStorage.getItem("UAP_MAP_API_KEY") || "";
+      let baseTileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+      let tileAttribution = '&copy; ESRI &copy; OpenStreetMap';
+
+      if (customKey.startsWith("pk.")) {
+        baseTileUrl = `https://api.mapbox.com/styles/v1/mapbox/dark-v11/tiles/{z}/{x}/{y}?access_token=${customKey}`;
+        tileAttribution = '&copy; Mapbox &copy; OpenStreetMap';
+      }
+
+      const currentTileLayer = L.tileLayer(baseTileUrl, {
+        attribution: tileAttribution,
         maxZoom: 18
       }).addTo(map);
 
+      window.setMapApiKey = function() {
+        const key = prompt("Enter your Mapbox / MapTiler API Key (optional):", customKey);
+        if (key !== null) {
+          localStorage.setItem("UAP_MAP_API_KEY", key.trim());
+          location.reload();
+        }
+      };
+
       markers = L.markerClusterGroup();
+
 
       sightings.forEach(s => {
         const lat = parseFloat(s.latitude);
