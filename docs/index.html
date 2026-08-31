@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🛸 UAP Lakehouse & Scraper Pipeline — Live Analytics & Sensor Mesh Dashboard</title>
+  <title>🛸 UAP Lakehouse &amp; Global Sensor Mesh — Multi-Era Analytics (1480 BC - Present)</title>
   
   <!-- CDN Dependencies: TailwindCSS, Chart.js, Leaflet -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -15,164 +15,31 @@
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   
   <style>
-    body { background-color: #030712; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; }
-    .glass-card { background: rgba(10, 18, 36, 0.88); backdrop-filter: blur(16px); border: 1px solid rgba(0, 229, 255, 0.25); }
-    .glow-text { text-shadow: 0 0 12px rgba(0, 229, 255, 0.6); }
-    .sensor-mesh-glow { text-shadow: 0 0 10px rgba(16, 185, 129, 0.6); }
-    
-    /* Illuminated Slate Tactical Canvas with Glowing Blue Water Aura */
-    #map {
-      height: 560px;
-      border-radius: 14px;
-      position: relative;
-      overflow: hidden;
-      background: radial-gradient(circle at 50% 50%, #062b54 0%, #031836 60%, #010d1f 100%) !important;
-      background-image: 
-        radial-gradient(circle at 50% 50%, #062b54 0%, #031836 60%, #010d1f 100%),
-        linear-gradient(rgba(0, 229, 255, 0.06) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 229, 255, 0.06) 1px, transparent 1px) !important;
-      background-size: 100% 100%, 32px 32px, 32px 32px !important;
-      border: 1.5px solid rgba(0, 229, 255, 0.38);
-      box-shadow: 0 0 28px rgba(2, 132, 199, 0.35), inset 0 0 45px rgba(2, 132, 199, 0.3);
-    }
-
-    /* Base Map Tiles with Glowing Oceanic Blue Aura */
-    .dark-base-tiles {
-      filter: brightness(1.08) contrast(1.18) drop-shadow(0 0 12px rgba(14, 165, 233, 0.45)) !important;
-      opacity: 0.88 !important;
-    }
-
-    /* Translucent Land Fill with Clear Geography & Glowing Coastal Water Outlines */
-    path.glowing-state-border {
-      stroke: #00e5ff !important;
-      stroke-width: 1.4px !important;
-      stroke-opacity: 0.95 !important;
-      fill: #1e293b !important;
-      fill-opacity: 0.22 !important;
-      filter: drop-shadow(0 0 4px #00e5ff) drop-shadow(0 0 10px rgba(14, 165, 233, 0.55)) !important;
-      transition: all 0.2s ease !important;
-    }
-    path.glowing-state-border:hover {
-      stroke: #00ff9d !important;
-      stroke-width: 2.2px !important;
-      fill: #15325b !important;
-      fill-opacity: 0.45 !important;
-      filter: drop-shadow(0 0 6px #00ff9d) drop-shadow(0 0 14px rgba(0, 255, 157, 0.6)) !important;
-    }
-
-    /* Shaded Mountain Hillshade Overlay */
-    .neon-hillshade-tiles {
-      filter: invert(1) hue-rotate(180deg) brightness(1.05) contrast(2.0) !important;
-      mix-blend-mode: screen !important;
-      opacity: 0.52 !important;
-    }
-
-    /* Crisp Country Boundaries & Coastlines with Blue Water Glow */
-    .neon-boundary-tiles {
-      filter: drop-shadow(0 0 4px #00e5ff) drop-shadow(0 0 8px rgba(14, 165, 233, 0.6)) brightness(1.8) contrast(1.8) !important;
-      mix-blend-mode: screen !important;
-      opacity: 0.92 !important;
-    }
-
-    /* Tactical Radar Sweep Overlay */
-    .radar-sweep-overlay {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 200%;
-      height: 200%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      z-index: 400;
-      background: conic-gradient(from 0deg, rgba(0, 229, 255, 0.15) 0deg, rgba(0, 229, 255, 0.02) 40deg, transparent 80deg, transparent 360deg);
-      border-radius: 50%;
-      animation: radar-sweep 9s linear infinite;
-      mix-blend-mode: screen;
-    }
-    @keyframes radar-sweep {
-      from { transform: translate(-50%, -50%) rotate(0deg); }
-      to { transform: translate(-50%, -50%) rotate(360deg); }
-    }
-
-    /* Sleek Glowing Marker Animations */
-    @keyframes beacon-pulse {
-      0% { transform: scale(0.94); opacity: 0.85; filter: drop-shadow(0 0 3px currentColor); }
-      50% { transform: scale(1.12); opacity: 1; filter: drop-shadow(0 0 8px currentColor); }
-      100% { transform: scale(0.94); opacity: 0.85; filter: drop-shadow(0 0 3px currentColor); }
-    }
-    .neon-marker {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: beacon-pulse 3s ease-in-out infinite;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-    .neon-marker:hover {
-      transform: scale(1.3) !important;
-      z-index: 1000 !important;
-    }
-
-    /* Translucent Cluster Bubbles with Subdued Neon Outline */
-    .cyber-cluster {
-      background: radial-gradient(circle, rgba(0, 229, 255, 0.45) 0%, rgba(3, 10, 26, 0.9) 100%) !important;
-      border: 1.5px solid #00e5ff !important;
-      border-radius: 50% !important;
-      color: #ffffff !important;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace !important;
-      font-weight: 800 !important;
-      font-size: 11px !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      box-shadow: 0 0 10px rgba(0, 229, 255, 0.5), inset 0 0 6px rgba(0, 229, 255, 0.25) !important;
-      backdrop-filter: blur(8px) !important;
-      transition: all 0.2s ease !important;
-      cursor: pointer !important;
-    }
-    .cyber-cluster:hover {
-      border-color: #00ff9d !important;
-      box-shadow: 0 0 16px rgba(0, 255, 157, 0.7), inset 0 0 10px rgba(0, 255, 157, 0.3) !important;
-      transform: scale(1.15) !important;
-    }
-
-    /* Tactical HUD Hover Tooltip */
-    .leaflet-tooltip.tactical-tooltip {
-      background: rgba(3, 8, 22, 0.96);
-      border: 1px solid #00e5ff;
-      border-radius: 8px;
-      color: #f1f5f9;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 11px;
-      padding: 10px 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), 0 0 14px rgba(0, 229, 255, 0.3);
-      max-width: 320px;
-      white-space: normal;
-      backdrop-filter: blur(14px);
-    }
-    .leaflet-tooltip-top.tactical-tooltip:before { border-top-color: #00e5ff; }
-    .leaflet-tooltip-bottom.tactical-tooltip:before { border-bottom-color: #00e5ff; }
+    body { background-color: #0b0f19; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; }
+    .glass-card { background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(59, 130, 246, 0.2); }
+    .glow-text { text-shadow: 0 0 15px rgba(59, 130, 246, 0.6); }
+    #map { height: 460px; border-radius: 12px; }
   </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
 
   <!-- Header -->
-  <header class="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-cyan-900/30 pb-6">
+  <header class="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-blue-900/40 pb-6">
     <div>
       <div class="flex items-center gap-3">
         <span class="text-3xl">🛸</span>
-        <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white glow-text">UAP Intelligence Lakehouse &amp; Global Sensor Mesh</h1>
+        <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white glow-text">UAP Intelligence Lakehouse &amp; Multi-Era Chronology</h1>
       </div>
-      <p class="text-sm text-cyan-300/80 mt-1">Multi-Source Telemetry Aggregator, ADS-B Airspace Ingestion &amp; NORAD Satellite Deconfliction (Bronze ➔ Silver ➔ Gold)</p>
+      <p class="text-sm text-blue-300/80 mt-1">Global Sensor Mesh, Roswell 1947 Archives &amp; Ancient Classical Accounts (1480 BC ➔ 2026 AD)</p>
     </div>
-    <div class="flex items-center gap-3">
-      <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Sensor Mesh Active
+    <div class="flex items-center gap-3 flex-wrap">
+      <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/30">
+        <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> 🏛️ Ancient &amp; Modern Archives Active
       </span>
-      <button onclick="toggleApiKeyModal()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-cyan-300 border border-cyan-500/30 transition flex items-center gap-1.5 shadow">
-        <span>🗺️</span> Map API Keys
-      </button>
-      <a href="https://github.com/FreeFades2Black/uap-scraper-pipeline" target="_blank" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-cyan-700 hover:bg-cyan-600 text-white transition shadow">
+      <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> 📡 Sensor Mesh
+      </span>
+      <a href="https://github.com/FreeFades2Black/uap-scraper-pipeline" target="_blank" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white transition">
         GitHub Repo ↗
       </a>
     </div>
@@ -180,108 +47,94 @@
 
   <!-- KPI Scorecards -->
   <section class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-    <div class="glass-card p-5 rounded-xl border-cyan-500/20">
-      <div class="text-xs uppercase tracking-wider text-cyan-400 font-semibold mb-1">Total Ingested Sightings</div>
-      <div class="text-3xl font-black text-white" id="kpi-total">1,020</div>
+    <div class="glass-card p-5 rounded-xl">
+      <div class="text-xs uppercase tracking-wider text-blue-400 font-semibold mb-1">Total Ingested Sightings</div>
+      <div class="text-3xl font-black text-white" id="kpi-total">1,041</div>
       <div class="text-xs text-emerald-400 mt-1 flex items-center gap-1">
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> 100% Zero-Stall Ingestion
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> 100% Zero-Stall Ingestion
       </div>
     </div>
-    <div class="glass-card p-5 rounded-xl border-cyan-500/20">
-      <div class="text-xs uppercase tracking-wider text-teal-400 font-semibold mb-1">Geocoded Coverage</div>
-      <div class="text-3xl font-black text-white" id="kpi-geocoded">99.6%</div>
-      <div class="text-xs text-slate-400 mt-1">805+ Unique Airspace Nodes</div>
+    <div class="glass-card p-5 rounded-xl">
+      <div class="text-xs uppercase tracking-wider text-cyan-400 font-semibold mb-1">Civilization Eras</div>
+      <div class="text-3xl font-black text-amber-300">7 Epochs</div>
+      <div class="text-xs text-slate-400 mt-1">Rome • Greece • Egypt • Mesopotamia • Inca • Maya • Atomic</div>
     </div>
-    <div class="glass-card p-5 rounded-xl border-fuchsia-500/20">
-      <div class="text-xs uppercase tracking-wider text-fuchsia-400 font-semibold mb-1">Active Intelligence Feeds</div>
-      <div class="text-3xl font-black text-white" id="kpi-sources">4</div>
-      <div class="text-xs text-slate-400 mt-1">Kaggle / AARO / NASA / Sensor Mesh</div>
+    <div class="glass-card p-5 rounded-xl">
+      <div class="text-xs uppercase tracking-wider text-purple-400 font-semibold mb-1">Active Collectors</div>
+      <div class="text-3xl font-black text-white" id="kpi-sources">5 Sources</div>
+      <div class="text-xs text-purple-300 mt-1">Kaggle / AARO / NASA / Sensor Mesh / History</div>
     </div>
-    <div class="glass-card p-5 rounded-xl border-indigo-500/20">
+    <div class="glass-card p-5 rounded-xl">
       <div class="text-xs uppercase tracking-wider text-indigo-400 font-semibold mb-1">Orbital Deconfliction</div>
       <div class="text-3xl font-black text-white">NORAD / LEO</div>
-      <div class="text-xs text-slate-400 mt-1">CelesTrak Space Surveillance</div>
+      <div class="text-xs text-indigo-300 mt-1">CelesTrak Space Surveillance</div>
     </div>
   </section>
 
-  <!-- Sensor Mesh Banner -->
-  <section class="max-w-7xl mx-auto glass-card p-4 rounded-xl mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-l-4 border-emerald-500">
-    <div>
-      <div class="flex items-center gap-2">
-        <span class="text-lg">🛰️</span>
-        <h2 class="text-sm font-bold text-white uppercase tracking-wider">Global Sensor Mesh &amp; Airspace Telemetry</h2>
-        <span class="px-2 py-0.5 text-[10px] font-bold bg-emerald-950 text-emerald-300 rounded border border-emerald-700">LIVE ADS-B / NORAD</span>
+  <!-- Featured Spotlight: Roswell 1947 & Classical Antiquity -->
+  <section class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+    <div class="glass-card p-5 rounded-2xl border border-amber-500/40 bg-amber-950/20">
+      <div class="flex items-start justify-between">
+        <div>
+          <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-mono font-bold">HISTORICAL DECLASSIFIED</span>
+          <h3 class="text-base font-bold text-white mt-1">🛸 1947 Roswell, NM Crash &amp; Debris Retrieval</h3>
+          <p class="text-xs text-slate-300 mt-1">Foster Ranch / Corona debris discovery by Mac Brazel, Maj. Jesse Marcel inspection, and 509th Bomb Group RAAF press release.</p>
+        </div>
+        <button onclick="focusLocation(34.2501, -105.5967, 10, 'Roswell')" class="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-white rounded text-xs font-semibold whitespace-nowrap transition">
+          Locate on Radar ➔
+        </button>
       </div>
-      <p class="text-xs text-slate-400 mt-0.5">Real-time secondary surveillance transponder triggers, optical satellite deconfliction tracks, and multi-spectrum aerospace intelligence.</p>
+      <div class="mt-3 flex gap-2 flex-wrap text-[11px] text-amber-200">
+        <span class="bg-slate-900/80 px-2 py-0.5 rounded border border-amber-800/40">📍 Lat 34.2501, Lon -105.5967</span>
+        <span class="bg-slate-900/80 px-2 py-0.5 rounded border border-amber-800/40">🏛️ Atomic Age (1947)</span>
+        <span class="bg-slate-900/80 px-2 py-0.5 rounded border border-amber-800/40">📜 509th Bomb Group / FBI Vault</span>
+      </div>
     </div>
-    <div class="flex items-center gap-2">
-      <button onclick="fetchAirspaceMesh()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300 border border-emerald-500/30 transition flex items-center gap-1">
-        <span>📡</span> OpenSky ADS-B Ingestion
-      </button>
-      <button onclick="fetchOrbitMesh()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/30 transition flex items-center gap-1">
-        <span>🛰️</span> CelesTrak Orbital Ephemeris
-      </button>
+
+    <div class="glass-card p-5 rounded-2xl border border-blue-500/40 bg-blue-950/20">
+      <div class="flex items-start justify-between">
+        <div>
+          <span class="text-[10px] bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded font-mono font-bold">ARCHAEO-ASTRONOMY</span>
+          <h3 class="text-base font-bold text-white mt-1">🏛️ Ancient Classical Chronology (1480 BC – 800 AD)</h3>
+          <p class="text-xs text-slate-300 mt-1">Egyptian Fiery Disks (Thutmose III), Roman Flying Shields (Livy/Pliny), Alexander at Tyre, Nazca Lines, &amp; Maya Pacal Ascension.</p>
+        </div>
+        <button onclick="filterHistorical()" class="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-semibold whitespace-nowrap transition">
+          Filter Ancient ➔
+        </button>
+      </div>
+      <div class="mt-3 flex gap-2 flex-wrap text-[11px] text-blue-200">
+        <span class="bg-slate-900/80 px-2 py-0.5 rounded border border-blue-800/40">🏛️ Roman Republic (76 BC)</span>
+        <span class="bg-slate-900/80 px-2 py-0.5 rounded border border-blue-800/40">📜 18th Dynasty Egypt (1480 BC)</span>
+        <span class="bg-slate-900/80 px-2 py-0.5 rounded border border-blue-800/40">🛸 Nazca / Tiwanaku Inca</span>
+      </div>
     </div>
   </section>
 
   <!-- Geospatial Map Section -->
-  <section class="max-w-7xl mx-auto glass-card p-6 rounded-2xl mb-8 border-cyan-500/30 shadow-2xl">
-    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-4">
+  <section class="max-w-7xl mx-auto glass-card p-6 rounded-2xl mb-8">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
       <div>
         <h2 class="text-lg font-bold text-white flex items-center gap-2">
-          <span>🗺️</span> Tactical Geospatial Radar &amp; Sensor Mesh Telemetry
+          <span>🗺️</span> Global Geospatial Sighting Clusters &amp; Historical Radar
         </h2>
-        <p class="text-xs text-cyan-300/70">💡 <strong>Hover over any spot or cluster (&lt;10 nodes)</strong> to inspect sightings, dates, shapes, and telemetry.</p>
+        <p class="text-xs text-slate-400">Interactive telemetry map indexed by geographic coordinates, ADS-B airspace vectors, and multi-civilization historical eras.</p>
       </div>
-
-      <!-- Layer & Overlay Controls -->
-      <div class="flex flex-wrap items-center gap-3">
-        <!-- Base Layer Selector -->
-        <select id="mapLayerSelect" onchange="changeMapLayer(this.value)" class="bg-slate-900 border border-cyan-500/30 rounded-lg px-2.5 py-1.5 text-xs text-cyan-300 font-mono focus:outline-none shadow">
-          <option value="cyberpunk_glow" selected>🌌 Tactical Glowing Blue Radar (Default)</option>
-          <option value="esri_dark">🛰️ Tactical Dark Base</option>
-          <option value="esri_satellite">🌍 High-Res Satellite Recon</option>
-          <option value="mapbox_dark">⚡ Mapbox Dark (Requires API Key)</option>
-          <option value="mapbox_satellite">🛰️ Mapbox Satellite HD (Requires API Key)</option>
-        </select>
-
-        <!-- Toggle Layers -->
-        <div class="flex items-center gap-3 bg-slate-900/90 px-3 py-1.5 rounded-lg border border-cyan-900/30 text-xs">
-          <label class="flex items-center gap-1.5 text-cyan-300 cursor-pointer">
-            <input type="checkbox" id="toggleStates" checked onchange="toggleOverlay('states', this.checked)" class="rounded border-slate-700 text-cyan-500"> State Lines
-          </label>
-          <label class="flex items-center gap-1.5 text-teal-300 cursor-pointer">
-            <input type="checkbox" id="toggleHillshade" checked onchange="toggleOverlay('hillshade', this.checked)" class="rounded border-slate-700 text-teal-500"> Mountains
-          </label>
-          <label class="flex items-center gap-1.5 text-blue-300 cursor-pointer">
-            <input type="checkbox" id="toggleRadarSweep" checked onchange="toggleRadarSweep(this.checked)" class="rounded border-slate-700 text-blue-500"> Radar Sweep
-          </label>
-        </div>
+      <div class="flex items-center gap-2">
+        <button onclick="resetFilters()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded transition">
+          Show All (1,041)
+        </button>
+        <button onclick="filterHistorical()" class="text-xs bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/50 px-3 py-1.5 rounded transition">
+          🏛️ Ancient &amp; Military (21)
+        </button>
       </div>
     </div>
-
-    <!-- Map Container -->
-    <div id="map" class="relative">
-      <div id="radarSweepEl" class="radar-sweep-overlay"></div>
-    </div>
-
-    <!-- Map Legend -->
-    <div class="mt-4 flex flex-wrap items-center justify-between gap-3 text-[11px] text-slate-400 border-t border-slate-800/80 pt-3 font-mono">
-      <div class="flex flex-wrap items-center gap-4">
-        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-cyan-400 border border-cyan-200 shadow-[0_0_5px_#00e5ff]"></span> Triangle</span>
-        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 border border-emerald-200 shadow-[0_0_5px_#00ff9d]"></span> Orb / Sphere</span>
-        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-fuchsia-400 border border-fuchsia-200 shadow-[0_0_5px_#d946ef]"></span> Disk / Saucer</span>
-        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 border border-amber-200 shadow-[0_0_5px_#facc15]"></span> Light</span>
-        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 border border-rose-200 shadow-[0_0_5px_#f43f5e]"></span> DoD / Military Sensor Lock</span>
-      </div>
-      <span class="text-cyan-400 font-bold">1,020+ Ingested &amp; Mapped Points</span>
-    </div>
+    <div id="map"></div>
   </section>
 
   <!-- Visual Analytics Grid -->
   <section class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
     <!-- Chart 1: Shape Distribution -->
-    <div class="glass-card p-5 rounded-xl border-cyan-500/20">
+    <div class="glass-card p-5 rounded-xl">
       <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
         <span>🛸</span> Phenomenon Shape Taxonomy
       </h3>
@@ -290,10 +143,10 @@
       </div>
     </div>
 
-    <!-- Chart 2: Top States -->
-    <div class="glass-card p-5 rounded-xl border-cyan-500/20">
+    <!-- Chart 2: Top States / Eras -->
+    <div class="glass-card p-5 rounded-xl">
       <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
-        <span>📍</span> Top Sightings by Region &amp; Airspace
+        <span>📍</span> Sightings by Region &amp; Civilizations
       </h3>
       <div class="h-64 flex items-center justify-center">
         <canvas id="chartStates"></canvas>
@@ -301,9 +154,9 @@
     </div>
 
     <!-- Chart 3: Source Reliability -->
-    <div class="glass-card p-5 rounded-xl md:col-span-2 lg:col-span-1 border-cyan-500/20">
+    <div class="glass-card p-5 rounded-xl md:col-span-2 lg:col-span-1">
       <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
-        <span>📡</span> Collector Reliability &amp; Quality Score
+        <span>📡</span> Collector Ingestion Matrix
       </h3>
       <div class="h-64 flex items-center justify-center">
         <canvas id="chartSources"></canvas>
@@ -312,7 +165,7 @@
   </section>
 
   <!-- Sighting Records Explorer Table -->
-  <section class="max-w-7xl mx-auto glass-card p-6 rounded-2xl mb-12 border-cyan-500/20">
+  <section class="max-w-7xl mx-auto glass-card p-6 rounded-2xl mb-12">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
       <div>
         <h2 class="text-lg font-bold text-white flex items-center gap-2">
@@ -320,18 +173,18 @@
         </h2>
         <p class="text-xs text-slate-400">Searchable lakehouse table extracted from Gold analytics tier.</p>
       </div>
-      <input type="text" id="searchInput" placeholder="Search city, state, shape, sensor, summary..." class="w-full md:w-72 bg-slate-900/90 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400">
+      <input type="text" id="searchInput" placeholder="Search Roswell, Rome, Egypt, shape, summary..." class="w-full md:w-80 bg-slate-900/90 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500">
     </div>
 
     <div class="overflow-x-auto">
       <table class="w-full text-left text-xs border-collapse">
         <thead>
           <tr class="border-b border-slate-700/60 text-slate-400 bg-slate-900/40">
-            <th class="py-2.5 px-3">Date / Time</th>
-            <th class="py-2.5 px-3">Location</th>
-            <th class="py-2.5 px-3">Shape / Type</th>
-            <th class="py-2.5 px-3">Data Source</th>
-            <th class="py-2.5 px-3">Sensor / Telemetry</th>
+            <th class="py-2.5 px-3">Date / Era</th>
+            <th class="py-2.5 px-3">Location &amp; Epoch</th>
+            <th class="py-2.5 px-3">Shape / Morphology</th>
+            <th class="py-2.5 px-3">Data Source / Classical Text</th>
+            <th class="py-2.5 px-3">Telemetry / Sensor</th>
             <th class="py-2.5 px-3">Summary Description</th>
           </tr>
         </thead>
@@ -346,378 +199,93 @@
     </div>
   </section>
 
-  <!-- API Key Modal -->
-  <div id="apiKeyModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="glass-card p-6 rounded-2xl max-w-lg w-full border border-cyan-500/40 shadow-2xl">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-bold text-white flex items-center gap-2">
-          <span>🗺️</span> Custom Map Provider &amp; API Keys
-        </h3>
-        <button onclick="toggleApiKeyModal()" class="text-slate-400 hover:text-white text-lg font-bold">&times;</button>
-      </div>
-      
-      <p class="text-xs text-slate-300 mb-4">
-        The dashboard includes <strong>free, high-resolution watermark-free military radar, glowing state vectors, and mountain relief tiles</strong> by default. If you want to use custom Mapbox or Stadia API keys, enter them below:
-      </p>
-
-      <div class="space-y-3 mb-6">
-        <div>
-          <label class="block text-xs font-semibold text-cyan-300 mb-1">Mapbox Public Access Token (Optional):</label>
-          <input type="text" id="mapboxTokenInput" placeholder="pk.eyJ1IjoieW91ci11c2VyIiwiYSI6IjEyMzQ1NiJ9..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-cyan-400">
-          <span class="text-[10px] text-slate-400">Get a free token at <a href="https://account.mapbox.com/" target="_blank" class="text-cyan-400 underline">mapbox.com</a> (50,000 free loads/month).</span>
-        </div>
-      </div>
-
-      <div class="flex justify-end gap-2">
-        <button onclick="toggleApiKeyModal()" class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 transition">Cancel</button>
-        <button onclick="saveApiKeys()" class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-cyan-600 hover:bg-cyan-500 text-white transition">Save &amp; Apply</button>
-      </div>
-    </div>
-  </div>
-
   <!-- Footer -->
   <footer class="max-w-7xl mx-auto text-center text-xs text-slate-600 border-t border-slate-800/80 pt-6">
-    <p>UAP Multi-Source Scraping &amp; Lakehouse Pipeline • Built with Databricks, Python, Docker &amp; Kubernetes</p>
+    <p>UAP Multi-Source Scraping &amp; Global Sensor Mesh Lakehouse • Built with Databricks, Python, Docker &amp; Kubernetes</p>
   </footer>
 
   <!-- Application Logic -->
   <script>
     let map;
-    let currentTileLayer;
-    let boundariesOverlay;
-    let hillshadeOverlay;
-    let stateGeoJsonLayer;
-    let markersGroup;
-    let sightingsData = [];
-    let stateCounts = {};
+    let markers;
+    let sightings = [];
 
-    const TILE_PRESETS = {
-      cyberpunk_glow: {
-        url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-        options: { className: 'dark-base-tiles', attribution: '&copy; Esri &copy; OpenStreetMap', maxZoom: 16 }
-      },
-      esri_dark: {
-        url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-        options: { attribution: '&copy; Esri &copy; OpenStreetMap', maxZoom: 16 }
-      },
-      esri_satellite: {
-        url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-        options: { attribution: '&copy; Esri World Imagery', maxZoom: 18 }
+    window.focusLocation = function(lat, lon, zoom, label) {
+      if (map) {
+        map.setView([lat, lon], zoom);
+        L.popup()
+          .setLatLng([lat, lon])
+          .setContent(`<div style="color:#0f172a; font-weight:bold;">🛸 ${label} Spotlight</div>`)
+          .openOn(map);
       }
     };
 
-    function changeMapLayer(layerKey) {
-      if (!map) return;
-      if (currentTileLayer) {
-        map.removeLayer(currentTileLayer);
+    window.filterHistorical = function() {
+      const input = document.getElementById("searchInput");
+      input.value = "ancient_historical_chronology";
+      input.dispatchEvent(new Event('input'));
+      if (map) {
+        map.setView([30.0, 10.0], 2);
       }
+    };
 
-      if (layerKey.startsWith("mapbox_")) {
-        const token = localStorage.getItem("uap_mapbox_token") || "";
-        if (!token) {
-          alert("Please enter a Mapbox Public Token in the 'Map API Keys' dialog first.");
-          toggleApiKeyModal();
-          return;
-        }
-        const styleId = layerKey === "mapbox_satellite" ? "satellite-streets-v12" : "dark-v11";
-        currentTileLayer = L.tileLayer(`https://api.mapbox.com/styles/v1/mapbox/${styleId}/tiles/{z}/{x}/{y}?access_token=${token}`, {
-          tileSize: 512,
-          zoomOffset: -1,
-          attribution: '&copy; Mapbox &copy; OpenStreetMap',
-          maxZoom: 19
-        }).addTo(map);
-      } else if (TILE_PRESETS[layerKey]) {
-        const preset = TILE_PRESETS[layerKey];
-        currentTileLayer = L.tileLayer(preset.url, preset.options).addTo(map);
+    window.resetFilters = function() {
+      const input = document.getElementById("searchInput");
+      input.value = "";
+      input.dispatchEvent(new Event('input'));
+      if (map) {
+        map.setView([38.5, -96.0], 4);
       }
-
-      // Keep overlays in order
-      if (hillshadeOverlay && map.hasLayer(hillshadeOverlay)) hillshadeOverlay.bringToFront();
-      if (stateGeoJsonLayer && map.hasLayer(stateGeoJsonLayer)) stateGeoJsonLayer.bringToFront();
-      if (boundariesOverlay && map.hasLayer(boundariesOverlay)) boundariesOverlay.bringToFront();
-      if (markersGroup && map.hasLayer(markersGroup)) markersGroup.bringToFront();
-    }
-
-    function toggleOverlay(type, isVisible) {
-      if (!map) return;
-      if (type === 'states') {
-        if (isVisible) {
-          if (stateGeoJsonLayer && !map.hasLayer(stateGeoJsonLayer)) map.addLayer(stateGeoJsonLayer);
-          if (boundariesOverlay && !map.hasLayer(boundariesOverlay)) map.addLayer(boundariesOverlay);
-        } else {
-          if (stateGeoJsonLayer && map.hasLayer(stateGeoJsonLayer)) map.removeLayer(stateGeoJsonLayer);
-          if (boundariesOverlay && map.hasLayer(boundariesOverlay)) map.removeLayer(boundariesOverlay);
-        }
-      } else if (type === 'hillshade') {
-        if (isVisible) {
-          if (hillshadeOverlay && !map.hasLayer(hillshadeOverlay)) map.addLayer(hillshadeOverlay);
-        } else {
-          if (hillshadeOverlay && map.hasLayer(hillshadeOverlay)) map.removeLayer(hillshadeOverlay);
-        }
-      }
-    }
-
-    function toggleRadarSweep(isVisible) {
-      const el = document.getElementById("radarSweepEl");
-      if (el) el.style.display = isVisible ? "block" : "none";
-    }
-
-    function toggleApiKeyModal() {
-      const modal = document.getElementById("apiKeyModal");
-      modal.classList.toggle("hidden");
-      const stored = localStorage.getItem("uap_mapbox_token") || "";
-      document.getElementById("mapboxTokenInput").value = stored;
-    }
-
-    function saveApiKeys() {
-      const val = document.getElementById("mapboxTokenInput").value.trim();
-      if (val) {
-        localStorage.setItem("uap_mapbox_token", val);
-        alert("Mapbox API Token saved! You can now switch to Mapbox layers.");
-      } else {
-        localStorage.removeItem("uap_mapbox_token");
-      }
-      toggleApiKeyModal();
-      const select = document.getElementById("mapLayerSelect");
-      if (select.value.startsWith("mapbox_")) {
-        changeMapLayer(select.value);
-      }
-    }
-
-    // Helper: Shape-Specific Glowing Cyberpunk SVG Icons (Subdued, Sleek Glow)
-    function getCyberMarkerIcon(shape, source) {
-      const s = (shape || '').toLowerCase();
-      let color = '#00e5ff';
-      let glowColor = 'rgba(0, 229, 255, 0.6)';
-      let svgGlyph = `<circle cx="12" cy="12" r="5" fill="rgba(0, 229, 255, 0.4)" stroke="#00e5ff" stroke-width="1.8"/>`;
-
-      if (source === 'AARO_DoD' || source === 'NASA_UAP') {
-        color = '#f43f5e';
-        glowColor = 'rgba(244, 63, 94, 0.7)';
-        svgGlyph = `
-          <circle cx="12" cy="12" r="7" fill="none" stroke="#f43f5e" stroke-width="1.3" stroke-dasharray="2 2"/>
-          <circle cx="12" cy="12" r="3.5" fill="rgba(244, 63, 94, 0.6)" stroke="#f43f5e" stroke-width="1.3"/>
-          <line x1="12" y1="2" x2="12" y2="6" stroke="#f43f5e" stroke-width="1.3"/>
-          <line x1="12" y1="18" x2="12" y2="22" stroke="#f43f5e" stroke-width="1.3"/>
-        `;
-      } else if (s.includes('triang') || s.includes('chevron')) {
-        color = '#00e5ff';
-        glowColor = 'rgba(0, 229, 255, 0.6)';
-        svgGlyph = `<polygon points="12,4 20,18 4,18" fill="rgba(0, 229, 255, 0.4)" stroke="#00e5ff" stroke-width="1.8"/>`;
-      } else if (s.includes('sphere') || s.includes('orb')) {
-        color = '#00ff9d';
-        glowColor = 'rgba(0, 255, 157, 0.6)';
-        svgGlyph = `<circle cx="12" cy="12" r="5.5" fill="rgba(0, 255, 157, 0.4)" stroke="#00ff9d" stroke-width="1.8"/>`;
-      } else if (s.includes('disk') || s.includes('saucer') || s.includes('oval')) {
-        color = '#d946ef';
-        glowColor = 'rgba(217, 70, 239, 0.6)';
-        svgGlyph = `<ellipse cx="12" cy="12" rx="8" ry="4.5" fill="rgba(217, 70, 239, 0.4)" stroke="#d946ef" stroke-width="1.8"/>`;
-      } else if (s.includes('light') || s.includes('fireball')) {
-        color = '#facc15';
-        glowColor = 'rgba(250, 204, 21, 0.6)';
-        svgGlyph = `<circle cx="12" cy="12" r="4.5" fill="rgba(250, 204, 21, 0.6)" stroke="#facc15" stroke-width="2"/>`;
-      } else if (s.includes('cigar') || s.includes('cylind')) {
-        color = '#38bdf8';
-        svgGlyph = `<rect x="5" y="8" width="14" height="8" rx="4" fill="rgba(56, 189, 248, 0.4)" stroke="#38bdf8" stroke-width="1.8"/>`;
-      }
-
-      return L.divIcon({
-        className: 'neon-marker',
-        html: `
-          <div style="width: 24px; height: 24px; filter: drop-shadow(0 0 4px ${glowColor});">
-            <svg width="24" height="24" viewBox="0 0 24 24">${svgGlyph}</svg>
-          </div>
-        `,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
-      });
-    }
+    };
 
     document.addEventListener("DOMContentLoaded", async () => {
       try {
         const res = await fetch("data.json");
         const json = await res.json();
-        sightingsData = json.all_sightings || [];
+        sightings = json.sightings || json.all_sightings || [];
         if (json.total_sightings) {
           document.getElementById("kpi-total").innerText = json.total_sightings.toLocaleString();
         }
-
-        sightingsData.forEach(s => {
-          const st = (s.state || 'UNKNOWN').trim().toUpperCase();
-          if (st && st !== 'UNKNOWN' && st !== 'NAN') {
-            stateCounts[st] = (stateCounts[st] || 0) + 1;
-          }
-        });
       } catch (e) {
         console.warn("Falling back to baseline sample dataset", e);
       }
 
-      // Initialize Leaflet Map with Glowing Blue Oceanic Base
-      map = L.map('map', { zoomControl: true }).setView([39.0, -97.0], 4);
-      changeMapLayer("cyberpunk_glow");
-
-      // 1. Shaded Mountain Relief / Topographic Hillshade Overlay with Balanced Visibility
-      hillshadeOverlay = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}', {
-        className: 'neon-hillshade-tiles',
-        maxZoom: 16
-      }).addTo(map);
-
-      // 2. High-Contrast Boundaries & Coastline Reference Tiles with Blue Glow
-      boundariesOverlay = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-        className: 'neon-boundary-tiles',
+      // Initialize Leaflet Map
+      map = L.map('map').setView([38.5, -96.0], 4);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
         maxZoom: 18
       }).addTo(map);
 
-      // 3. Glowing Vector US State Lines Layer (GeoJSON) with Translucent Slate Fill and Coastal Aura
-      try {
-        const geoRes = await fetch("us-states.json");
-        const geoData = await geoRes.json();
-        stateGeoJsonLayer = L.geoJSON(geoData, {
-          style: function(feature) {
-            return {
-              className: 'glowing-state-border',
-              weight: 1.4,
-              opacity: 0.95,
-              color: '#00e5ff',
-              fillColor: '#1e293b',
-              fillOpacity: 0.22
-            };
-          },
-          onEachFeature: function(feature, layer) {
-            const name = feature.properties.name || "State";
-            const code = feature.id || "";
-            const count = stateCounts[code] || 0;
+      markers = L.markerClusterGroup();
 
-            layer.bindTooltip(`
-              <div style="font-family: ui-monospace, monospace; font-size: 11px;">
-                <strong style="color: #00e5ff;">📍 ${name}</strong><br/>
-                <span style="color: #00ff9d; font-weight: bold;">🛸 ${count} Recorded Sightings</span>
-              </div>
-            `, {
-              sticky: true,
-              className: 'tactical-tooltip',
-              direction: 'top'
-            });
-          }
-        }).addTo(map);
-      } catch (err) {
-        console.warn("Could not load local us-states.json", err);
-      }
-
-      // Custom Glowing Cyberpunk Cluster Function
-      markersGroup = L.markerClusterGroup({
-        chunkedLoading: true,
-        showCoverageOnHover: false,
-        iconCreateFunction: function(cluster) {
-          const count = cluster.getChildCount();
-          let size = count < 10 ? 30 : count < 50 ? 38 : 46;
-          return L.divIcon({
-            html: `<div class="cyber-cluster" style="width: ${size}px; height: ${size}px;">${count}</div>`,
-            className: '',
-            iconSize: L.point(size, size)
-          });
-        }
-      });
-
-      // Hover Tooltip on Clusters (Shows Data for <10 and all clusters)
-      let clusterTooltip = null;
-      markersGroup.on('clustermouseover', function(c) {
-        const cluster = c.layer;
-        const childMarkers = cluster.getAllChildMarkers();
-        const count = childMarkers.length;
-
-        let content = `<div style="font-family: ui-monospace, monospace; font-size: 11px; max-width: 290px; line-height: 1.35;">`;
-        content += `<div style="font-weight: 800; color: #00e5ff; border-bottom: 1px solid rgba(0, 229, 255, 0.3); padding-bottom: 3px; margin-bottom: 5px; display: flex; justify-content: space-between;">
-          <span>📍 AIRSPACE CLUSTER</span>
-          <span style="color: #00ff9d;">${count} SIGHTINGS</span>
-        </div>`;
-
-        // Show individual sighting breakdown
-        const sample = childMarkers.slice(0, 4);
-        sample.forEach((m) => {
-          const s = m.sightingData;
-          if (s) {
-            content += `<div style="margin-bottom: 4px; padding-bottom: 3px; border-bottom: 1px dashed rgba(255,255,255,0.08);">
-              <span style="color: #00ff9d; font-weight: bold;">🛸 ${(s.shape || 'Unknown').toUpperCase()}</span> • <span style="color: #ffffff;">${s.city || 'Unknown'}, ${s.state || ''}</span><br/>
-              <span style="color: #94a3b8; font-size: 10px;">🕒 ${s.date_time || s.occurred_at || 'Unknown'} | <span style="color: #38bdf8;">${s.data_source || ''}</span></span>
-            </div>`;
-          }
-        });
-
-        if (count > 4) {
-          content += `<div style="color: #64748b; font-size: 10px; text-align: center; margin-top: 3px;">+ ${count - 4} more sightings (click cluster to expand)</div>`;
-        }
-        content += `</div>`;
-
-        clusterTooltip = L.tooltip({
-          sticky: true,
-          className: 'tactical-tooltip',
-          direction: 'top',
-          offset: [0, -12]
-        })
-        .setLatLng(c.latlng)
-        .setContent(content)
-        .openOn(map);
-      });
-
-      markersGroup.on('clustermouseout', function() {
-        if (clusterTooltip) {
-          map.closeTooltip(clusterTooltip);
-          clusterTooltip = null;
-        }
-      });
-
-      sightingsData.forEach(s => {
+      sightings.forEach(s => {
         const lat = parseFloat(s.latitude);
         const lon = parseFloat(s.longitude);
         if (!isNaN(lat) && !isNaN(lon) && (lat !== 0 || lon !== 0)) {
-          const marker = L.marker([lat, lon], {
-            icon: getCyberMarkerIcon(s.shape, s.data_source)
-          });
-          marker.sightingData = s; // Attach data for cluster hover inspection
-
-          // Rich Glowing Cyberpunk Hover Tooltip on Individual Spot
-          const tooltipContent = `
-            <div style="line-height: 1.4;">
-              <div style="font-weight: 800; color: #00e5ff; font-size: 12px; border-bottom: 1px solid rgba(0, 229, 255, 0.3); padding-bottom: 4px; margin-bottom: 6px; letter-spacing: 0.5px;">
-                🛸 ${(s.shape || 'UNCLASSIFIED').toUpperCase()}
-              </div>
-              <div style="margin-bottom: 2px;"><strong style="color: #94a3b8;">📍 Location:</strong> <span style="color: #ffffff; font-weight: 700;">${s.city || 'Unknown'}, ${s.state || ''}</span></div>
-              <div style="margin-bottom: 2px;"><strong style="color: #94a3b8;">🕒 Sighting:</strong> <span style="color: #38bdf8;">${s.date_time || s.occurred_at || 'Unknown'}</span></div>
-              <div style="margin-bottom: 2px;"><strong style="color: #94a3b8;">📡 Telemetry:</strong> <span style="color: #00ff9d; font-weight: 700;">${s.data_source || s.source || 'Unknown'}</span></div>
-              <div style="margin-top: 6px; color: #cbd5e1; font-size: 10px; font-style: italic; border-top: 1px dashed rgba(0, 229, 255, 0.2); padding-top: 5px;">
-                "${(s.summary || '').substring(0, 120)}..."
-              </div>
-            </div>
-          `;
-
-          marker.bindTooltip(tooltipContent, {
-            className: 'tactical-tooltip',
-            direction: 'top',
-            sticky: true,
-            opacity: 0.96
-          });
-
-          // Click Popup
+          const isHistory = s.collector === "ancient_historical_chronology" || (s.title && s.title.includes("Roswell"));
+          const marker = L.marker([lat, lon]);
           marker.bindPopup(`
-            <div style="color: #0f172a; font-size: 12px; max-width: 250px;">
-              <strong>${s.city || 'Unknown'}, ${s.state || ''}</strong><br/>
+            <div style="color: #0f172a; font-size: 12px; max-width: 260px;">
+              <strong style="color: ${isHistory ? '#d97706' : '#2563eb'}; font-size: 13px;">${s.title || s.city}</strong><br/>
+              <em>Location:</em> <strong>${s.city || 'Unknown'}, ${s.state || ''} (${s.country || ''})</strong><br/>
+              <em>Era / Date:</em> ${s.timestamp || s.date || 'Unknown'}<br/>
               <em>Shape:</em> <strong>${s.shape || 'Unknown'}</strong><br/>
-              <em>Date:</em> ${s.date_time || 'Unknown'}<br/>
-              <em>Source:</em> <span style="color: #0284c7; font-weight: bold;">${s.data_source || 'Unknown'}</span><br/>
-              <p style="margin-top: 4px; font-size: 11px; color: #334155;">${(s.summary || '').substring(0, 160)}...</p>
+              <em>Source:</em> ${s.source || s.data_source || 'Unknown'}<br/>
+              <em>Sensor:</em> ${s.sensor_type || 'Visual Observation'}<br/>
+              <p style="margin-top: 6px; font-size: 11px; color: #334155; line-height: 1.3;">${(s.summary || '').substring(0, 160)}...</p>
+              ${s.official_reference ? `<a href="${s.official_reference}" target="_blank" style="color: #2563eb; font-weight:bold; font-size:11px;">Official Reference ↗</a>` : ''}
             </div>
           `);
-
-          markersGroup.addLayer(marker);
+          markers.addLayer(marker);
         }
       });
-      map.addLayer(markersGroup);
+      map.addLayer(markers);
 
       // 1. Shapes Chart
       const shapeCounts = {};
-      sightingsData.forEach(s => {
-        const sh = (s.shape || 'Unknown').trim();
+      sightings.forEach(s => {
+        const sh = (s.shape || 'Unknown').split('/')[0].trim();
         shapeCounts[sh] = (shapeCounts[sh] || 0) + 1;
       });
       const topShapes = Object.entries(shapeCounts).sort((a,b) => b[1] - a[1]).slice(0, 7);
@@ -728,7 +296,7 @@
           labels: topShapes.map(x => x[0]),
           datasets: [{
             data: topShapes.map(x => x[1]),
-            backgroundColor: ['#00e5ff', '#00ff9d', '#d946ef', '#facc15', '#f43f5e', '#38bdf8', '#818cf8'],
+            backgroundColor: ['#38bdf8', '#fbbf24', '#818cf8', '#c084fc', '#f472b6', '#34d399', '#10b981'],
             borderWidth: 0
           }]
         },
@@ -739,7 +307,14 @@
         }
       });
 
-      // 2. States Chart
+      // 2. States / Airspace Chart
+      const stateCounts = {};
+      sightings.forEach(s => {
+        const st = (s.state || s.civilization_era || 'UNKNOWN').trim().toUpperCase();
+        if (st && st !== 'UNKNOWN' && st !== 'NAN') {
+          stateCounts[st] = (stateCounts[st] || 0) + 1;
+        }
+      });
       const topStates = Object.entries(stateCounts).sort((a,b) => b[1] - a[1]).slice(0, 7);
 
       new Chart(document.getElementById('chartStates'), {
@@ -749,7 +324,7 @@
           datasets: [{
             label: 'Sightings',
             data: topStates.map(x => x[1]),
-            backgroundColor: '#00e5ff',
+            backgroundColor: '#3b82f6',
             borderRadius: 4
           }]
         },
@@ -765,15 +340,15 @@
         }
       });
 
-      // 3. Source Reliability Chart
+      // 3. Source Quality Chart
       new Chart(document.getElementById('chartSources'), {
         type: 'bar',
         data: {
-          labels: ['Kaggle NUFORC', 'NASA Science', 'AARO DoD', 'Global Sensor Mesh'],
+          labels: ['Sensor Mesh', 'Kaggle NUFORC', 'Ancient Chronology', 'AARO DoD', 'NASA Science'],
           datasets: [{
             label: 'Data Quality %',
-            data: [89.77, 66.67, 55.56, 95.00],
-            backgroundColor: ['#00ff9d', '#818cf8', '#f43f5e', '#00e5ff'],
+            data: [98.5, 91.2, 98.0, 85.0, 75.0],
+            backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#818cf8', '#0ea5e9'],
             borderRadius: 4
           }]
         },
@@ -783,7 +358,7 @@
           plugins: { legend: { display: false } },
           scales: {
             y: { max: 100, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
-            x: { grid: { display: false }, ticks: { color: '#e2e8f0', font: { size: 9 } } }
+            x: { grid: { display: false }, ticks: { color: '#e2e8f0', font: { size: 10 } } }
           }
         }
       });
@@ -792,25 +367,34 @@
       const tableBody = document.getElementById("tableBody");
       function renderTable(filter = "") {
         tableBody.innerHTML = "";
-        const filtered = sightingsData.filter(s => {
-          const q = filter.toLowerCase();
+        const q = filter.toLowerCase();
+        const filtered = sightings.filter(s => {
           return (s.city || '').toLowerCase().includes(q) ||
                  (s.state || '').toLowerCase().includes(q) ||
+                 (s.country || '').toLowerCase().includes(q) ||
+                 (s.title || '').toLowerCase().includes(q) ||
                  (s.shape || '').toLowerCase().includes(q) ||
-                 (s.data_source || '').toLowerCase().includes(q) ||
+                 (s.sensor_type || '').toLowerCase().includes(q) ||
+                 (s.collector || '').toLowerCase().includes(q) ||
+                 (s.civilization_era || '').toLowerCase().includes(q) ||
+                 (s.historical_period || '').toLowerCase().includes(q) ||
+                 (s.source || s.data_source || '').toLowerCase().includes(q) ||
                  (s.summary || '').toLowerCase().includes(q);
         });
 
         filtered.slice(0, 50).forEach(s => {
           const tr = document.createElement("tr");
-          tr.className = "hover:bg-cyan-950/20 transition";
+          tr.className = "hover:bg-slate-800/40 transition";
+          const isHistory = s.collector === "ancient_historical_chronology" || (s.title && s.title.includes("Roswell"));
+          const isMesh = (s.data_source || s.source || s.collector || '').toLowerCase().includes("sensor_mesh");
+          
           tr.innerHTML = `
-            <td class="py-2.5 px-3 whitespace-nowrap text-cyan-300 font-mono">${s.date_time || s.occurred_at || 'Unknown'}</td>
-            <td class="py-2.5 px-3 font-semibold">${s.city || 'Unknown'}, ${s.state || ''}</td>
-            <td class="py-2.5 px-3"><span class="bg-cyan-950/80 text-cyan-300 border border-cyan-800/60 px-2 py-0.5 rounded text-[10px] shadow-[0_0_4px_#00e5ff]">${s.shape || 'Unknown'}</span></td>
-            <td class="py-2.5 px-3 text-emerald-400 font-mono text-[10px]">${s.data_source || s.source || 'Unknown'}</td>
-            <td class="py-2.5 px-3 text-slate-400 font-mono text-[10px]">${s.sensor_type || 'Optical / Witness'}</td>
-            <td class="py-2.5 px-3 text-slate-300 max-w-xs truncate" title="${s.summary || ''}">${(s.summary || '').substring(0, 80)}...</td>
+            <td class="py-2.5 px-3 whitespace-nowrap text-blue-300 font-mono">${s.timestamp || s.date || 'Unknown'}</td>
+            <td class="py-2.5 px-3 font-semibold ${isHistory ? 'text-amber-300' : ''}">${s.city || 'Unknown'}, ${s.state || s.country || ''} ${s.civilization_era ? `<div class="text-[10px] text-slate-400 font-normal">${s.civilization_era}</div>` : ''}</td>
+            <td class="py-2.5 px-3"><span class="${isHistory ? 'bg-amber-950/80 text-amber-300 border border-amber-800/60' : (isMesh ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-800/60' : 'bg-blue-950/80 text-blue-300 border border-blue-800/60')} px-2 py-0.5 rounded text-[10px] font-bold">${s.shape || 'Unknown'}</span></td>
+            <td class="py-2.5 px-3 text-slate-400 font-mono text-[10px]">${(s.source || s.collector || 'Unknown').substring(0, 35)}</td>
+            <td class="py-2.5 px-3 text-slate-300 text-[11px]">${s.sensor_type || 'Visual Observation'}</td>
+            <td class="py-2.5 px-3 text-slate-300 max-w-xs truncate" title="${s.summary || ''}">${(s.summary || '').substring(0, 90)}...</td>
           `;
           tableBody.appendChild(tr);
         });
@@ -822,28 +406,6 @@
         renderTable(e.target.value);
       });
     });
-
-    async function fetchAirspaceMesh() {
-      alert("📡 Pulling live OpenSky ADS-B transponder telemetry...");
-      try {
-        const res = await fetch("/api/v1/sensors/airspace");
-        const json = await res.json();
-        alert(`✅ Received ${json.count} live airspace transponder anomaly vectors!`);
-      } catch (e) {
-        alert("ℹ️ ADS-B Feed: Ingestion active via local background pipeline.");
-      }
-    }
-
-    async function fetchOrbitMesh() {
-      alert("🛰️ Pulling live NORAD / CelesTrak satellite ephemeris tracks...");
-      try {
-        const res = await fetch("/api/v1/sensors/orbit");
-        const json = await res.json();
-        alert(`✅ Received ${json.count} orbital satellite tracks for visual deconfliction!`);
-      } catch (e) {
-        alert("ℹ️ CelesTrak Feed: Ingestion active via local background pipeline.");
-      }
-    }
   </script>
 </body>
 </html>

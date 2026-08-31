@@ -9,6 +9,7 @@ from .mufon_collector import MUFONCollector
 from .ufostalker_collector import UFOStalkerCollector
 from .aaro_collector import AAROCollector
 from .global_sensor_mesh_collector import GlobalSensorMeshCollector
+from .ancient_and_historical_chronology_collector import AncientHistoricalChronologyCollector
 from .synthetic_collector import SyntheticCollector
 
 __all__ = [
@@ -21,6 +22,8 @@ __all__ = [
     "UFOStalkerCollector",
     "AAROCollector",
     "GlobalSensorMeshCollector",
+    "AncientHistoricalChronologyCollector",
     "SyntheticCollector",
 ]
+
 

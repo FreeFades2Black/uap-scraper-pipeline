@@ -255,7 +255,17 @@ def get_sensor_mesh_intelligence():
     return {"status": "success", "count": len(intel), "intelligence_reports": intel}
 
 
+@app.get("/api/v1/sensors/historical", tags=["Historical & Classical Archives"])
+def get_historical_uap_archives():
+    """Query multi-millennium historical UAP events (Roswell 1947, Roman, Greek, Egyptian, Mesopotamian, Inca, Maya)."""
+    from .collectors.ancient_and_historical_chronology_collector import AncientHistoricalChronologyCollector
+    collector = AncientHistoricalChronologyCollector()
+    records = collector.scrape()
+    return {"status": "success", "count": len(records), "records": records}
+
+
 if __name__ == "__main__":
+
     import uvicorn
     uvicorn.run(app, host=config.api_host, port=config.api_port)
 
