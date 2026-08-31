@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🛸 UAP Intelligence Lakehouse &amp; Multi-Era Chronology (1480 BC - Present)</title>
+  <title>🛸 UAP Intelligence Lakehouse &amp; Multi-Era Radar (1480 BC - Present)</title>
   
-  <!-- CDN Dependencies: TailwindCSS, Leaflet, MarkerCluster, Chart.js -->
+  <!-- CDN Dependencies: TailwindCSS, Cloudflare Leaflet & MarkerCluster, Chart.js -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
-  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
@@ -22,12 +22,12 @@
     #map { height: 520px; width: 100%; border-radius: 0.75rem; z-index: 10; }
     
     /* Custom MarkerCluster Styling */
-    .marker-cluster-small { background-color: rgba(56, 189, 248, 0.6); }
-    .marker-cluster-small div { background-color: rgba(14, 165, 233, 0.85); color: #fff; font-weight: bold; }
-    .marker-cluster-medium { background-color: rgba(245, 158, 11, 0.6); }
-    .marker-cluster-medium div { background-color: rgba(217, 119, 6, 0.85); color: #fff; font-weight: bold; }
-    .marker-cluster-large { background-color: rgba(168, 85, 247, 0.6); }
-    .marker-cluster-large div { background-color: rgba(147, 51, 234, 0.85); color: #fff; font-weight: bold; }
+    .marker-cluster-small { background-color: rgba(56, 189, 248, 0.6) !important; }
+    .marker-cluster-small div { background-color: rgba(14, 165, 233, 0.9) !important; color: #fff !important; font-weight: bold; }
+    .marker-cluster-medium { background-color: rgba(245, 158, 11, 0.6) !important; }
+    .marker-cluster-medium div { background-color: rgba(217, 119, 6, 0.9) !important; color: #fff !important; font-weight: bold; }
+    .marker-cluster-large { background-color: rgba(168, 85, 247, 0.6) !important; }
+    .marker-cluster-large div { background-color: rgba(147, 51, 234, 0.9) !important; color: #fff !important; font-weight: bold; }
 
     /* Timeline Scroll & Styling */
     .timeline-container {
@@ -76,17 +76,17 @@
     }
 
     /* Radar Ping Animation */
-    .radar-ping-amber {
+    .radar-dot-amber {
       width: 14px; height: 14px; background: #f59e0b; border: 2px solid #ffffff; border-radius: 50%;
-      box-shadow: 0 0 8px #f59e0b, 0 0 16px #f59e0b; cursor: pointer;
+      box-shadow: 0 0 10px #f59e0b, 0 0 20px #f59e0b; cursor: pointer;
     }
-    .radar-ping-indigo {
-      width: 12px; height: 12px; background: #818cf8; border: 2px solid #ffffff; border-radius: 50%;
-      box-shadow: 0 0 8px #818cf8, 0 0 16px #818cf8; cursor: pointer;
+    .radar-dot-indigo {
+      width: 13px; height: 13px; background: #818cf8; border: 2px solid #ffffff; border-radius: 50%;
+      box-shadow: 0 0 10px #818cf8, 0 0 20px #818cf8; cursor: pointer;
     }
-    .radar-ping-cyan {
-      width: 10px; height: 10px; background: #38bdf8; border: 1.5px solid #ffffff; border-radius: 50%;
-      box-shadow: 0 0 6px #38bdf8, 0 0 12px #38bdf8; cursor: pointer;
+    .radar-dot-cyan {
+      width: 11px; height: 11px; background: #38bdf8; border: 2px solid #ffffff; border-radius: 50%;
+      box-shadow: 0 0 8px #38bdf8, 0 0 16px #38bdf8; cursor: pointer;
     }
   </style>
 </head>
@@ -99,11 +99,11 @@
         <span class="text-3xl">🛸</span>
         <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white glow-cyan">UAP Intelligence Lakehouse &amp; Multi-Era Radar</h1>
       </div>
-      <p class="text-xs md:text-sm text-cyan-400 mt-1">Live Geospatial Plotting (1,050+ Points) • Dual-Track Time-Correlator • DoD AARO &amp; NASA Declassified Vault</p>
+      <p class="text-xs md:text-sm text-cyan-400 mt-1">Live Geospatial Radar (1,026+ Plots) • Dual-Track Time-Correlator • DoD AARO &amp; NASA Declassified Vault</p>
     </div>
     <div class="flex items-center gap-3 flex-wrap">
       <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> 🗺️ 1,026+ Plots Live on Radar
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> 🗺️ <span id="headerPlotCount">1,026</span> Plots Live on Radar
       </span>
       <button onclick="setMapApiKey()" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-800/40 transition flex items-center gap-1.5">
         <span>🔑</span> Map API Key
@@ -519,73 +519,48 @@
       }
     };
 
-    document.addEventListener("DOMContentLoaded", async () => {
-      renderDualTrackTimeline();
-
-      // Initialize Leaflet Map with ESRI Dark Canvas Basemap
-      map = L.map('map').setView([38.5, -96.0], 4);
-      
-      const customKey = localStorage.getItem("UAP_MAP_API_KEY") || "";
-      let baseTileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
-      let tileAttribution = '&copy; ESRI &copy; OpenStreetMap';
-
-      if (customKey.startsWith("pk.")) {
-        baseTileUrl = `https://api.mapbox.com/styles/v1/mapbox/dark-v11/tiles/{z}/{x}/{y}?access_token=${customKey}`;
-        tileAttribution = '&copy; Mapbox &copy; OpenStreetMap';
+    function plotMarkersOnMap(dataList) {
+      if (!map) return;
+      if (markers) {
+        map.removeLayer(markers);
       }
 
-      L.tileLayer(baseTileUrl, {
-        attribution: tileAttribution,
-        maxZoom: 18
-      }).addTo(map);
-
-      window.setMapApiKey = function() {
-        const key = prompt("Enter your Mapbox / MapTiler API Key (optional):", customKey);
-        if (key !== null) {
-          localStorage.setItem("UAP_MAP_API_KEY", key.trim());
-          location.reload();
-        }
-      };
-
-      markers = L.markerClusterGroup({
-        chunkedLoading: true,
-        maxClusterRadius: 40,
-        spiderfyOnMaxZoom: true,
-        showCoverageOnHover: false
-      });
-
       try {
-        const res = await fetch("data.json");
-        const json = await res.json();
-        sightings = json.sightings || json.all_sightings || [];
-        if (json.total_sightings) {
-          document.getElementById("kpi-total").innerText = json.total_sightings.toLocaleString();
+        if (typeof L.markerClusterGroup === 'function') {
+          markers = L.markerClusterGroup({
+            chunkedLoading: true,
+            maxClusterRadius: 40,
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: false
+          });
+        } else {
+          markers = L.layerGroup();
         }
       } catch (e) {
-        console.warn("Falling back to baseline dataset", e);
+        markers = L.layerGroup();
       }
 
       let plottedCount = 0;
-      sightings.forEach(s => {
+      dataList.forEach(s => {
         const lat = parseFloat(s.latitude);
         const lon = parseFloat(s.longitude);
         if (!isNaN(lat) && !isNaN(lon) && (lat !== 0 || lon !== 0) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
           plottedCount++;
           const isHistory = s.collector === "ancient_historical_chronology" || (s.title && s.title.includes("Roswell"));
-          const isAARO = s.collector === "AARO_DoD" || (s.report_link && s.report_link.includes("aaro"));
+          const isAARO = s.collector === "AARO_DoD" || (s.report_link && s.report_link.includes("aaro")) || s.data_source === "AARO_DoD";
           
-          let pingClass = "radar-ping-cyan";
+          let pingClass = "radar-dot-cyan";
           let markerColor = "#38bdf8";
 
           if (isHistory) {
-            pingClass = "radar-ping-amber";
+            pingClass = "radar-dot-amber";
             markerColor = "#f59e0b";
           } else if (isAARO) {
-            pingClass = "radar-ping-indigo";
+            pingClass = "radar-dot-indigo";
             markerColor = "#818cf8";
           }
 
-          // Custom DivIcon glowing radar beacon
+          // DivIcon glowing radar beacon
           const radarIcon = L.divIcon({
             className: "radar-beacon-container",
             html: `<div class="${pingClass}"></div>`,
@@ -623,11 +598,56 @@
       });
 
       map.addLayer(markers);
-      setTimeout(() => { map.invalidateSize(); }, 200);
+      map.invalidateSize();
 
       document.getElementById("kpi-geocoded").innerText = `${plottedCount.toLocaleString()}`;
+      document.getElementById("headerPlotCount").innerText = `${plottedCount.toLocaleString()}`;
       document.getElementById("btnTotalCount").innerText = `${plottedCount.toLocaleString()}`;
       document.getElementById("tableTotalHeader").innerText = `${plottedCount.toLocaleString()}`;
+      console.log("✅ Successfully rendered radar plots on map:", plottedCount);
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      renderDualTrackTimeline();
+
+      // Initialize Leaflet Map with ESRI Dark Canvas Basemap
+      map = L.map('map').setView([38.5, -96.0], 4);
+      
+      const customKey = localStorage.getItem("UAP_MAP_API_KEY") || "";
+      let baseTileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+      let tileAttribution = '&copy; ESRI &copy; OpenStreetMap';
+
+      if (customKey.startsWith("pk.")) {
+        baseTileUrl = `https://api.mapbox.com/styles/v1/mapbox/dark-v11/tiles/{z}/{x}/{y}?access_token=${customKey}`;
+        tileAttribution = '&copy; Mapbox &copy; OpenStreetMap';
+      }
+
+      L.tileLayer(baseTileUrl, {
+        attribution: tileAttribution,
+        maxZoom: 18
+      }).addTo(map);
+
+      window.setMapApiKey = function() {
+        const key = prompt("Enter your Mapbox / MapTiler API Key (optional):", customKey);
+        if (key !== null) {
+          localStorage.setItem("UAP_MAP_API_KEY", key.trim());
+          location.reload();
+        }
+      };
+
+      try {
+        const res = await fetch("data.json");
+        const json = await res.json();
+        sightings = json.sightings || json.all_sightings || [];
+        if (json.total_sightings) {
+          document.getElementById("kpi-total").innerText = json.total_sightings.toLocaleString();
+        }
+      } catch (e) {
+        console.warn("Falling back to baseline dataset", e);
+      }
+
+      // Plot all sightings on map
+      plotMarkersOnMap(sightings);
 
       // 1. Shapes Chart
       const shapeCounts = {};
@@ -720,7 +740,7 @@
           const tr = document.createElement('tr');
           tr.className = 'hover:bg-slate-800/40 transition';
           const isHistory = s.collector === "ancient_historical_chronology" || (s.title && s.title.includes("Roswell"));
-          const isAARO = s.collector === "AARO_DoD" || (s.report_link && s.report_link.includes("aaro"));
+          const isAARO = s.collector === "AARO_DoD" || (s.report_link && s.report_link.includes("aaro")) || s.data_source === "AARO_DoD";
           
           let badgeClass = "bg-blue-950 text-blue-300 border border-blue-800";
           if (isHistory) badgeClass = "bg-amber-950 text-amber-300 border border-amber-800";
@@ -731,7 +751,7 @@
             <td class="py-2 px-3 font-semibold ${isHistory ? 'text-amber-300' : isAARO ? 'text-indigo-300' : 'text-white'}">${s.title || `${s.city || 'Unknown'}, ${s.state || ''}`}</td>
             <td class="py-2 px-3"><span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 font-mono">${s.shape || 'Unknown'}</span></td>
             <td class="py-2 px-3 text-slate-400 font-mono text-[11px]">${s.duration || s.duration_seconds || 'N/A'}</td>
-            <td class="py-2 px-3"><span class="px-2 py-0.5 rounded text-[10px] ${badgeClass}">${s.collector || s.data_source || 'Core'}</span></td>
+            <td class="py-2 px-3"><span class="px-2 py-0.5 rounded text-[10px] ${badgeClass}">${s.collector || s.data_source || s.source || 'Core'}</span></td>
             <td class="py-2 px-3 text-slate-300 max-w-xs truncate" title="${s.summary || s.description || ''}">${s.summary || s.description || 'No description available'}</td>
             <td class="py-2 px-3">
               ${s.latitude && s.longitude ? `<button onclick="focusLocation(${s.latitude}, ${s.longitude}, 10, '${s.city || s.title}')" class="text-cyan-400 hover:text-cyan-300 font-semibold text-[11px]">Locate ➔</button>` : ''}
@@ -754,9 +774,11 @@
                  (s.summary || '').toLowerCase().includes(q) ||
                  (s.description || '').toLowerCase().includes(q) ||
                  (s.collector || '').toLowerCase().includes(q) ||
+                 (s.data_source || '').toLowerCase().includes(q) ||
                  (s.title || '').toLowerCase().includes(q);
         });
         renderTable(filtered);
+        plotMarkersOnMap(filtered);
       });
     });
   </script>
