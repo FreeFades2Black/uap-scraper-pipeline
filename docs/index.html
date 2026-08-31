@@ -20,35 +20,36 @@
     .glow-text { text-shadow: 0 0 12px rgba(0, 229, 255, 0.6); }
     .sensor-mesh-glow { text-shadow: 0 0 10px rgba(16, 185, 129, 0.6); }
     
-    /* Illuminated Slate Tactical Canvas with Clear Topography */
+    /* Illuminated Slate Tactical Canvas with Glowing Blue Water Aura */
     #map {
       height: 560px;
       border-radius: 14px;
       position: relative;
       overflow: hidden;
-      background-color: #0c1424 !important;
+      background: radial-gradient(circle at 50% 50%, #062b54 0%, #031836 60%, #010d1f 100%) !important;
       background-image: 
+        radial-gradient(circle at 50% 50%, #062b54 0%, #031836 60%, #010d1f 100%),
         linear-gradient(rgba(0, 229, 255, 0.06) 1px, transparent 1px),
         linear-gradient(90deg, rgba(0, 229, 255, 0.06) 1px, transparent 1px) !important;
-      background-size: 32px 32px !important;
+      background-size: 100% 100%, 32px 32px, 32px 32px !important;
       border: 1.5px solid rgba(0, 229, 255, 0.38);
-      box-shadow: 0 0 24px rgba(0, 0, 0, 0.6), inset 0 0 35px rgba(0, 0, 0, 0.65);
+      box-shadow: 0 0 28px rgba(2, 132, 199, 0.35), inset 0 0 45px rgba(2, 132, 199, 0.3);
     }
 
-    /* Illuminated Base Map Tiles */
+    /* Base Map Tiles with Glowing Oceanic Blue Aura */
     .dark-base-tiles {
-      filter: brightness(1.05) contrast(1.15) !important;
-      opacity: 0.85 !important;
+      filter: brightness(1.08) contrast(1.18) drop-shadow(0 0 12px rgba(14, 165, 233, 0.45)) !important;
+      opacity: 0.88 !important;
     }
 
-    /* Translucent Land Fill with Clear Geography & Crisp Laser Outlines */
+    /* Translucent Land Fill with Clear Geography & Glowing Coastal Water Outlines */
     path.glowing-state-border {
       stroke: #00e5ff !important;
       stroke-width: 1.4px !important;
       stroke-opacity: 0.95 !important;
       fill: #1e293b !important;
       fill-opacity: 0.22 !important;
-      filter: drop-shadow(0 0 3px #00e5ff) drop-shadow(0 0 7px rgba(0, 229, 255, 0.45)) !important;
+      filter: drop-shadow(0 0 4px #00e5ff) drop-shadow(0 0 10px rgba(14, 165, 233, 0.55)) !important;
       transition: all 0.2s ease !important;
     }
     path.glowing-state-border:hover {
@@ -56,7 +57,7 @@
       stroke-width: 2.2px !important;
       fill: #15325b !important;
       fill-opacity: 0.45 !important;
-      filter: drop-shadow(0 0 6px #00ff9d) drop-shadow(0 0 12px rgba(0, 255, 157, 0.6)) !important;
+      filter: drop-shadow(0 0 6px #00ff9d) drop-shadow(0 0 14px rgba(0, 255, 157, 0.6)) !important;
     }
 
     /* Shaded Mountain Hillshade Overlay */
@@ -66,11 +67,11 @@
       opacity: 0.52 !important;
     }
 
-    /* Crisp Country Boundaries & Coastlines */
+    /* Crisp Country Boundaries & Coastlines with Blue Water Glow */
     .neon-boundary-tiles {
-      filter: drop-shadow(0 0 3px #00e5ff) brightness(1.8) contrast(1.8) !important;
+      filter: drop-shadow(0 0 4px #00e5ff) drop-shadow(0 0 8px rgba(14, 165, 233, 0.6)) brightness(1.8) contrast(1.8) !important;
       mix-blend-mode: screen !important;
-      opacity: 0.9 !important;
+      opacity: 0.92 !important;
     }
 
     /* Tactical Radar Sweep Overlay */
@@ -237,7 +238,7 @@
       <div class="flex flex-wrap items-center gap-3">
         <!-- Base Layer Selector -->
         <select id="mapLayerSelect" onchange="changeMapLayer(this.value)" class="bg-slate-900 border border-cyan-500/30 rounded-lg px-2.5 py-1.5 text-xs text-cyan-300 font-mono focus:outline-none shadow">
-          <option value="cyberpunk_glow" selected>🌌 Tactical Slate Radar (Default)</option>
+          <option value="cyberpunk_glow" selected>🌌 Tactical Glowing Blue Radar (Default)</option>
           <option value="esri_dark">🛰️ Tactical Dark Base</option>
           <option value="esri_satellite">🌍 High-Res Satellite Recon</option>
           <option value="mapbox_dark">⚡ Mapbox Dark (Requires API Key)</option>
@@ -551,7 +552,7 @@
         console.warn("Falling back to baseline sample dataset", e);
       }
 
-      // Initialize Leaflet Map with Balanced Contrast Slate Navy Base
+      // Initialize Leaflet Map with Glowing Blue Oceanic Base
       map = L.map('map', { zoomControl: true }).setView([39.0, -97.0], 4);
       changeMapLayer("cyberpunk_glow");
 
@@ -561,13 +562,13 @@
         maxZoom: 16
       }).addTo(map);
 
-      // 2. High-Contrast Boundaries & Coastline Reference Tiles
+      // 2. High-Contrast Boundaries & Coastline Reference Tiles with Blue Glow
       boundariesOverlay = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
         className: 'neon-boundary-tiles',
         maxZoom: 18
       }).addTo(map);
 
-      // 3. Glowing Vector US State Lines Layer (GeoJSON) with Light Translucent Slate Fill
+      // 3. Glowing Vector US State Lines Layer (GeoJSON) with Translucent Slate Fill and Coastal Aura
       try {
         const geoRes = await fetch("us-states.json");
         const geoData = await geoRes.json();
