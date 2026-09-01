@@ -9,6 +9,10 @@ Automated pipeline collecting UAP sighting data from 8+ open-source repositories
 [![Docker](https://img.shields.io/badge/Docker-Multi--Stage%20Container-blue?style=for-the-badge&logo=docker)](https://github.com/FreeFades2Black/uap-scraper-pipeline/blob/main/Dockerfile)
 [![Kubernetes](https://img.shields.io/badge/Kubernetes-Helm%20Chart-326ce5?style=for-the-badge&logo=kubernetes)](https://github.com/FreeFades2Black/uap-scraper-pipeline/tree/main/charts/uap-scraper)
 
+> [!TIP]
+> ### 🛸 **[👉 CLICK HERE TO LAUNCH LIVE UAP GEOSPATIAL INTELLIGENCE RADAR ↗](https://freefades2black.github.io/uap-scraper-pipeline/)**
+> **Zero installation or cloud setup required.** Click the link above to explore the live interactive geospatial cluster map (1,005+ records), 75-year historical chronological timeline (1480 BC to Present), and shape taxonomy analytics directly in your browser.
+
 ---
 
 ## 📑 Latest UAP Intelligence & Sighting Reports
