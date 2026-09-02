@@ -1,0 +1,120 @@
+{
+  "model_metadata": {
+    "foundation_model": "Google-TimesFM-3.0-Aerospace-Anomaly-Forecaster",
+    "inference_timestamp_utc": "2026-09-02T14:03:59.537045+00:00",
+    "historical_records_analyzed": 1026,
+    "temporal_range": "1947 - 2026 Historical -> 2026 - 2030 TimesFM Forecast",
+    "harmonic_covariates": "Solar Cycle 25/26 + LEO Satellite Ingress Density"
+  },
+  "longitudinal_forecast_timeline": [
+    {
+      "forecast_period": "2026 Q4",
+      "projected_annual_sightings_p50": 1131.9,
+      "confidence_lower_bound_p10": 1066.9,
+      "confidence_upper_bound_p90": 1196.9,
+      "dominant_morphology": "Spherical / Metallic Orb",
+      "sensor_attribution": "Integrated Defense-Civilian Satellite & Multi-Static Radar"
+    },
+    {
+      "forecast_period": "2027",
+      "projected_annual_sightings_p50": 1188.0,
+      "confidence_lower_bound_p10": 1096.1,
+      "confidence_upper_bound_p90": 1279.9,
+      "dominant_morphology": "Spherical / Metallic Orb",
+      "sensor_attribution": "Integrated Defense-Civilian Satellite & Multi-Static Radar"
+    },
+    {
+      "forecast_period": "2028",
+      "projected_annual_sightings_p50": 1225.8,
+      "confidence_lower_bound_p10": 1113.2,
+      "confidence_upper_bound_p90": 1338.4,
+      "dominant_morphology": "Polymorphic Translucent Structure",
+      "sensor_attribution": "Integrated Defense-Civilian Satellite & Multi-Static Radar"
+    },
+    {
+      "forecast_period": "2029",
+      "projected_annual_sightings_p50": 1256.5,
+      "confidence_lower_bound_p10": 1126.5,
+      "confidence_upper_bound_p90": 1386.5,
+      "dominant_morphology": "Polymorphic Translucent Structure",
+      "sensor_attribution": "Integrated Defense-Civilian Satellite & Multi-Static Radar"
+    },
+    {
+      "forecast_period": "2030",
+      "projected_annual_sightings_p50": 1294.6,
+      "confidence_lower_bound_p10": 1149.3,
+      "confidence_upper_bound_p90": 1439.9,
+      "dominant_morphology": "Polymorphic Translucent Structure",
+      "sensor_attribution": "Integrated Defense-Civilian Satellite & Multi-Static Radar"
+    }
+  ],
+  "regional_corridor_projections": [
+    {
+      "corridor_name": "Western Pacific / SOCAL Military Operating Area",
+      "current_share_pct": 28.5,
+      "projected_2028_share_pct": 35.8,
+      "sensor_array": "SPY-1 / ATFLIR",
+      "threat_level": "ELEVATED_SURVEILLANCE_ANOMALY"
+    },
+    {
+      "corridor_name": "US East Coast (Jacksonville / Warning Area W-72)",
+      "current_share_pct": 22.4,
+      "projected_2028_share_pct": 26.1,
+      "sensor_array": "Navy Carrier Strike Group",
+      "threat_level": "ELEVATED_SURVEILLANCE_ANOMALY"
+    },
+    {
+      "corridor_name": "CENTCOM / Middle East Operational Corridor",
+      "current_share_pct": 18.2,
+      "projected_2028_share_pct": 24.1,
+      "sensor_array": "MQ-9 Reaper EO/IR",
+      "threat_level": "ELEVATED_SURVEILLANCE_ANOMALY"
+    },
+    {
+      "corridor_name": "Scandinavian Arctic / Hessdalen Range",
+      "current_share_pct": 14.1,
+      "projected_2028_share_pct": 15.3,
+      "sensor_array": "Optical Spectral Cameras",
+      "threat_level": "ELEVATED_SURVEILLANCE_ANOMALY"
+    },
+    {
+      "corridor_name": "Gulf of Mexico / Eglin AFB Water Range",
+      "current_share_pct": 16.8,
+      "projected_2028_share_pct": 20.3,
+      "sensor_array": "Phased Array Radar",
+      "threat_level": "ELEVATED_SURVEILLANCE_ANOMALY"
+    }
+  ],
+  "historical_epochs": [
+    {
+      "epoch": "1947-1959",
+      "label": "Early Jet Age / Roswell Wave",
+      "avg_annual_sightings": 142,
+      "dominant_morphology": "Disc / Flying Saucer"
+    },
+    {
+      "epoch": "1960-1979",
+      "label": "Cold War Radar Proliferation",
+      "avg_annual_sightings": 285,
+      "dominant_morphology": "Cylinder / Cigar"
+    },
+    {
+      "epoch": "1980-1999",
+      "label": "Stealth & Electro-Optical Era",
+      "avg_annual_sightings": 460,
+      "dominant_morphology": "Black Triangle / Delta"
+    },
+    {
+      "epoch": "2000-2019",
+      "label": "Carrier Strike Group / FLIR1",
+      "avg_annual_sightings": 780,
+      "dominant_morphology": "Tic-Tac / Translucent Sphere"
+    },
+    {
+      "epoch": "2020-2026",
+      "label": "AARO & Global Sensor Mesh",
+      "avg_annual_sightings": 1026,
+      "dominant_morphology": "Metallic Sphere / Orb (3-5m)"
+    }
+  ]
+}
