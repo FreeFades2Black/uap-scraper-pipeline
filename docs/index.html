@@ -105,9 +105,9 @@
       <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> 🗺️ <span id="headerPlotCount">1,026</span> Plots Live on Radar
       </span>
-      <button onclick="setMapApiKey()" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-800/40 transition flex items-center gap-1.5">
-        <span>🔑</span> Map API Key
-      </button>
+      <span class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-purple-950/80 text-purple-300 border border-purple-800/60 flex items-center gap-1.5 font-mono">
+        <span>🌐</span> Zero-Key Dark Map Active
+      </span>
       <a href="https://github.com/FreeFades2Black/uap-scraper-pipeline" target="_blank" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white transition">
         GitHub Repo ↗
       </a>
@@ -173,7 +173,7 @@
         <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-[0_0_8px_#818cf8]"></span> DoD AARO Declassified (2004-2026)</span>
         <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#38bdf8]"></span> Multi-Source Civilian &amp; Sensor Mesh</span>
       </div>
-      <div class="text-[11px] text-cyan-400 font-mono">ESRI World Dark Canvas • Zero Watermark</div>
+      <div class="text-[11px] text-cyan-400 font-mono">CartoDB Dark Matter &amp; OpenStreetMap • Zero API Key Required</div>
     </div>
   </section>
 
@@ -610,30 +610,28 @@
     document.addEventListener("DOMContentLoaded", async () => {
       renderDualTrackTimeline();
 
-      // Initialize Leaflet Map with ESRI Dark Canvas Basemap
+      // Initialize Leaflet Map with Zero-Key CartoDB Dark Matter Basemap
       map = L.map('map').setView([38.5, -96.0], 4);
       
-      const customKey = localStorage.getItem("UAP_MAP_API_KEY") || "";
-      let baseTileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
-      let tileAttribution = '&copy; ESRI &copy; OpenStreetMap';
+      const darkMatterTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        subdomains: 'abcd',
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+      });
 
-      if (customKey.startsWith("pk.")) {
-        baseTileUrl = `https://api.mapbox.com/styles/v1/mapbox/dark-v11/tiles/{z}/{x}/{y}?access_token=${customKey}`;
-        tileAttribution = '&copy; Mapbox &copy; OpenStreetMap';
-      }
+      const osmTiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+      });
 
-      L.tileLayer(baseTileUrl, {
-        attribution: tileAttribution,
-        maxZoom: 18
-      }).addTo(map);
+      darkMatterTiles.addTo(map);
 
-      window.setMapApiKey = function() {
-        const key = prompt("Enter your Mapbox / MapTiler API Key (optional):", customKey);
-        if (key !== null) {
-          localStorage.setItem("UAP_MAP_API_KEY", key.trim());
-          location.reload();
-        }
+      // Add base layer switcher (Zero Keys Needed)
+      const baseMaps = {
+        "🌌 Dark Radar Canvas": darkMatterTiles,
+        "🛰️ OpenStreetMap": osmTiles
       };
+      L.control.layers(baseMaps, null, { position: 'topright' }).addTo(map);
 
       try {
         const res = await fetch("data.json");
